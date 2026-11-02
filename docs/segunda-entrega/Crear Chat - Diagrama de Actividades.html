@@ -1,0 +1,96 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Diagrama de Actividades - Crear Chat</title><style>
+:root{--b:#3b4652;--t:#1b2733}
+body{margin:0;background:#fff;font-family:"Segoe UI",Arial,sans-serif;color:#1b2733}
+#cap{display:inline-block;padding:16px 18px 10px;background:#fff}
+h1{font-size:19px;margin:0 0 3px} p{margin:0 0 6px;font-size:12.5px;color:#4a5866}
+svg .ts{font-size:12px;fill:#1b2733} svg .th{font-size:14px;font-weight:700;fill:#1b2733}
+svg .arr{stroke:#1b2733;stroke-width:1.3;fill:none}
+svg .leader{stroke:#4a5866;stroke-width:1;stroke-dasharray:4 3;fill:none}
+svg .box{fill:#fff;stroke:#1b2733;stroke-width:1.1}
+svg .c-teal rect,svg .c-teal polygon{fill:#e1f3f1;stroke:#0f6e66;stroke-width:1.1}
+svg .c-purple rect,svg .c-purple polygon{fill:#ece8fb;stroke:#5a45b0;stroke-width:1.1}
+svg .c-amber rect,svg .c-amber polygon{fill:#fdf3d8;stroke:#a77400;stroke-width:1.1}
+svg .c-teal circle,svg .c-purple circle,svg .c-amber circle{fill:#fff;stroke:#1b2733}
+</style></head><body><div id="cap">
+<h1>Diagrama de Actividades: Crear Chat (UcabMarket)</h1>
+<p>HU del Sprint 1 · Autor: Viana, José · Actor: Miembro de la comunidad UCAB</p>
+<svg width="680" viewBox="0 0 680 960" role="img"><title>Diagrama de actividades: Crear chat según el Brief</title><desc>Calles Actor y Sistema. El actor presiona Contactar vendedor; el sistema pide confirmar; el actor presiona y en el rombo elige Crear chat; el sistema crea el chat y muestra Chat creado; el actor presiona OK y el sistema muestra el chat. El actor escribe y presiona Enviar; el sistema muestra el mensaje actualizado y el conector 2 regresa a Muestra el chat. Si no se creó, el conector 1 regresa al paso 2. Cada salir va a una barra de unión que cancela el proceso y regresa a Consultar.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="40" y="30" width="175" height="920" fill="none" stroke="var(--b)" stroke-width="0.5"/>
+<rect x="215" y="30" width="425" height="920" fill="none" stroke="var(--b)" stroke-width="0.5"/>
+<line x1="40" y1="60" x2="640" y2="60" stroke="var(--b)" stroke-width="0.5"/>
+<text class="th" x="128" y="45" text-anchor="middle" dominant-baseline="central">Actor</text>
+<text class="th" x="427" y="45" text-anchor="middle" dominant-baseline="central">Sistema</text>
+<circle cx="70" cy="90" r="8" fill="var(--t)"/>
+<g class="c-amber"><polygon points="90,72 200,72 210,82 210,108 90,108" stroke-width="0.5"/><text class="ts" x="150" y="83" text-anchor="middle" dominant-baseline="central">CU extendido de</text><text class="ts" x="150" y="98" text-anchor="middle" dominant-baseline="central">Consultar producto</text></g>
+<line x1="78" y1="90" x2="90" y2="90" class="leader"/>
+<line x1="70" y1="99" x2="70" y2="151" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="50" y="153" width="155" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="127" y="163" text-anchor="middle" dominant-baseline="central">1. Presiona</text><text class="ts" x="127" y="177" text-anchor="middle" dominant-baseline="central">«Contactar vendedor»</text></g>
+<path d="M207 170 L470 170 L470 198" fill="none" class="arr" marker-end="url(#arrow)"/>
+<circle cx="520" cy="183" r="8" fill="none" stroke="var(--t)" stroke-width="1"/><text class="ts" x="520" y="183" text-anchor="middle" dominant-baseline="central">1</text>
+<line x1="520" y1="192" x2="520" y2="198" class="arr" marker-end="url(#arrow)"/>
+<rect x="410" y="200" width="120" height="5" fill="var(--t)"/>
+<line x1="470" y1="206" x2="470" y2="223" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="225" width="160" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="470" y="238" text-anchor="middle" dominant-baseline="central">2. Muestra interfaz</text><text class="ts" x="470" y="252" text-anchor="middle" dominant-baseline="central">«¿Crear chat?»</text></g>
+<line x1="390" y1="245" x2="207" y2="245" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="50" y="228" width="155" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="127" y="245" text-anchor="middle" dominant-baseline="central">3. Presiona</text></g>
+<line x1="127" y1="264" x2="127" y2="272" class="arr" marker-end="url(#arrow)"/>
+<polygon class="box" points="109,290 127,274 145,290 127,306" stroke-width="0.5"/>
+<text class="ts" x="178" y="280" text-anchor="middle" dominant-baseline="central">Crear chat</text>
+<line x1="145" y1="290" x2="388" y2="290" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="96" y="280" text-anchor="middle" dominant-baseline="central">no</text>
+<path d="M109 290 L44 290 L44 838" fill="none" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="270" width="160" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="470" y="290" text-anchor="middle" dominant-baseline="central">4. Crea el chat</text></g>
+<rect class="box" x="570" y="270" width="66" height="40" rx="0" stroke-width="0.5"/><text class="ts" x="603" y="283" text-anchor="middle" dominant-baseline="central">datos del</text><text class="ts" x="603" y="297" text-anchor="middle" dominant-baseline="central">producto</text>
+<line x1="570" y1="290" x2="553" y2="290" class="leader" marker-end="url(#arrow)"/>
+<line x1="470" y1="312" x2="470" y2="327" class="arr" marker-end="url(#arrow)"/>
+<polygon class="box" points="452,345 470,329 488,345 470,361" stroke-width="0.5"/>
+<text class="ts" x="436" y="335" text-anchor="middle" dominant-baseline="central">no</text>
+<line x1="452" y1="345" x2="357" y2="345" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="225" y="328" width="130" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="290" y="345" text-anchor="middle" dominant-baseline="central">4.1 No se creó</text></g>
+<line x1="290" y1="364" x2="290" y2="376" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="225" y="378" width="130" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="290" y="391" text-anchor="middle" dominant-baseline="central">4.2 Muestra interfaz</text><text class="ts" x="290" y="405" text-anchor="middle" dominant-baseline="central">«No se pudo crear»</text></g>
+<line x1="225" y1="398" x2="207" y2="398" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="50" y="381" width="155" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="127" y="398" text-anchor="middle" dominant-baseline="central">4.3 Confirma lectura</text></g>
+<path d="M127 417 L127 434 L230 434" fill="none" class="arr" marker-end="url(#arrow)"/>
+<circle cx="240" cy="434" r="8" fill="none" stroke="var(--t)" stroke-width="1"/><text class="ts" x="240" y="434" text-anchor="middle" dominant-baseline="central">1</text>
+<text class="ts" x="480" y="375" dominant-baseline="central">sí</text>
+<line x1="470" y1="363" x2="470" y2="448" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="450" width="160" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="470" y="463" text-anchor="middle" dominant-baseline="central">5. Muestra mensaje</text><text class="ts" x="470" y="477" text-anchor="middle" dominant-baseline="central">«Chat creado»</text></g>
+<line x1="390" y1="470" x2="207" y2="470" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="50" y="453" width="155" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="127" y="470" text-anchor="middle" dominant-baseline="central">6. Presiona</text></g>
+<line x1="127" y1="489" x2="127" y2="502" class="arr" marker-end="url(#arrow)"/>
+<polygon class="box" points="109,520 127,504 145,520 127,536" stroke-width="0.5"/>
+<text class="ts" x="164" y="510" text-anchor="middle" dominant-baseline="central">OK</text>
+<path d="M145 520 L450 520 L450 556" fill="none" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="96" y="510" text-anchor="middle" dominant-baseline="central">no</text>
+<path d="M109 520 L56 520 L56 838" fill="none" class="arr" marker-end="url(#arrow)"/>
+<circle cx="510" cy="540" r="8" fill="none" stroke="var(--t)" stroke-width="1"/><text class="ts" x="510" y="540" text-anchor="middle" dominant-baseline="central">2</text>
+<line x1="510" y1="549" x2="510" y2="556" class="arr" marker-end="url(#arrow)"/>
+<rect x="410" y="558" width="120" height="5" fill="var(--t)"/>
+<line x1="470" y1="564" x2="470" y2="578" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="580" width="160" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="470" y="593" text-anchor="middle" dominant-baseline="central">7. Muestra el chat</text><text class="ts" x="470" y="607" text-anchor="middle" dominant-baseline="central">sin datos personales</text></g>
+<path d="M470 622 L470 652 L207 652" fill="none" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="62" y="635" width="143" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="133" y="652" text-anchor="middle" dominant-baseline="central">8. Escribe el mensaje</text></g>
+<line x1="133" y1="671" x2="133" y2="693" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="62" y="695" width="143" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="133" y="712" text-anchor="middle" dominant-baseline="central">9. Presiona</text></g>
+<line x1="133" y1="731" x2="133" y2="747" class="arr" marker-end="url(#arrow)"/>
+<polygon class="box" points="115,765 133,749 151,765 133,781" stroke-width="0.5"/>
+<text class="ts" x="180" y="755" text-anchor="middle" dominant-baseline="central">Enviar</text>
+<line x1="151" y1="765" x2="388" y2="765" class="arr" marker-end="url(#arrow)"/>
+<text class="ts" x="100" y="753" text-anchor="middle" dominant-baseline="central">Salir</text>
+<path d="M115 765 L68 765 L68 838" fill="none" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="745" width="160" height="40" rx="18" stroke-width="0.5"/><text class="ts" x="470" y="758" text-anchor="middle" dominant-baseline="central">10. Muestra mensaje</text><text class="ts" x="470" y="772" text-anchor="middle" dominant-baseline="central">actualizado</text></g>
+<rect class="box" x="570" y="745" width="66" height="40" rx="0" stroke-width="0.5"/><text class="ts" x="603" y="765" text-anchor="middle" dominant-baseline="central">Mensaje</text>
+<line x1="570" y1="765" x2="553" y2="765" class="leader" marker-end="url(#arrow)"/>
+<line x1="470" y1="787" x2="470" y2="800" class="arr" marker-end="url(#arrow)"/>
+<circle cx="470" cy="810" r="8" fill="none" stroke="var(--t)" stroke-width="1"/><text class="ts" x="470" y="810" text-anchor="middle" dominant-baseline="central">2</text>
+<rect x="40" y="840" width="145" height="6" fill="var(--t)"/>
+<path d="M112 846 L112 881 L388 881" fill="none" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="390" y="864" width="160" height="34" rx="17" stroke-width="0.5"/><text class="ts" x="470" y="881" text-anchor="middle" dominant-baseline="central">11.2 Cancela el proceso</text></g>
+<line x1="470" y1="900" x2="470" y2="913" class="arr" marker-end="url(#arrow)"/>
+<circle cx="470" cy="924" r="9" fill="none" stroke="var(--t)" stroke-width="1"/><circle cx="470" cy="924" r="5" fill="var(--t)"/>
+<line x1="479" y1="924" x2="488" y2="924" class="leader"/>
+<g class="c-amber"><polygon points="488,911 614,911 622,919 622,937 488,937" stroke-width="0.5"/><text class="ts" x="553" y="924" text-anchor="middle" dominant-baseline="central">Regresa a Consultar</text></g>
+</svg>
+</div></body></html>

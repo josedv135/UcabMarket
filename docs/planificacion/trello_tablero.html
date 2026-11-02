@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#EEF2F5;font-family:"Segoe UI",Arial,sans-serif;color:#1d2b36;width:1600px;padding:28px 36px 36px}
+h1{margin:0 0 4px;font-size:30px;color:#0A6C8C}
+.sub{color:#51626f;font-size:16px;margin-bottom:22px}
+.row{display:flex;gap:18px;align-items:flex-start}
+.list{background:#DFE6EB;border-radius:12px;padding:12px;width:290px}
+.list h2{margin:0 0 10px;font-size:18px}
+.card{background:#fff;border-radius:8px;padding:9px 11px;margin-bottom:8px;font-size:15px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.card.sm{font-size:14px;padding:7px 10px}
+.l-inicio h2{color:#2f6f3e}.l-plan h2{color:#8a5a00}.l-ej h2{color:#0A6C8C}.l-seg h2{color:#7a3b8f}.l-cierre h2{color:#a33a3a}
+.n{display:inline-block;background:#0A6C8C;color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-weight:700;font-size:14px;margin-right:6px}
+.par{position:relative;margin:0 0 4px;height:46px}
+.brace{position:absolute;left:0;right:0;top:20px;height:18px;border:3px solid #d9534f;border-bottom:none;border-radius:10px 10px 0 0}
+.par span{position:absolute;top:-4px;left:50%;transform:translateX(-50%);background:#EEF2F5;color:#d9534f;font-weight:700;padding:0 10px;font-size:16px}
+.sec{margin:34px 0 10px;font-size:22px;font-weight:700;color:#0A6C8C}
+.sprint{background:#DFE6EB;border-radius:12px;padding:12px;width:360px}
+.sprint h3{margin:0 0 10px;font-size:17px;color:#0A6C8C}
+.dash{background:transparent;border:2px dashed #9aaab6;color:#7b8b97}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:#fff;border-radius:4px;padding:1px 7px;margin-bottom:5px}
+.t-u{background:#3a7bd5}.t-p{background:#2e9e5b}.t-c{background:#e08a1e}.t-ch{background:#8e5ac8}.t-r{background:#d4a800}
+.arrow{font-size:34px;color:#7b8b97;margin:0 10px;align-self:center}
+.detail{background:#fff;border-radius:14px;padding:20px 24px;width:560px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.detail h3{margin:0 0 4px;font-size:20px}
+.stage{font-weight:700;color:#fff;border-radius:6px;padding:3px 10px;font-size:14px;display:inline-block;margin:10px 0 4px}
+.s-esp{background:#2e9e5b}.s-dis{background:#3a7bd5}.s-imp{background:#8e5ac8}
+.chk{font-size:16px;padding:3px 0 3px 4px}
+.chk:before{content:"☐ ";color:#51626f}
+.nota{font-size:14px;color:#51626f;margin-top:10px}
+.cap{font-size:14px;color:#51626f;margin-top:6px}
+.wrong{display:flex;gap:30px;margin-top:6px}
+</style></head><body>
+
+<h1>Tablero de Trello de UcabMarket</h1>
+<div class="sub">Así debe quedar: las listas son las <b>fases del proyecto</b> (no «Por hacer / En progreso / Hecho»).</div>
+
+<div class="par" style="margin-left:620px;width:598px"><div class="brace"></div><span>van en paralelo</span></div>
+
+<div class="row">
+  <div class="list l-inicio"><h2><span class="n">1</span>Inicio</h2>
+    <div class="card"><b>Brief</b></div>
+    <div class="card sm">Reglas ISO 25010</div>
+    <div class="card sm">Restricciones</div>
+    <div class="card sm">Equipo y roles</div>
+  </div>
+  <div class="list l-plan"><h2><span class="n">2</span>Planificación</h2>
+    <div class="card"><b>Plan (cronograma)</b></div>
+    <div class="card">Herramientas</div>
+    <div class="card">Maqueta general</div>
+    <div class="card">Arquitectura base</div>
+  </div>
+  <div class="list l-ej"><h2><span class="n">3</span>Ejecución</h2>
+    <div class="card sm" style="background:#CFE9F1">Se divide en sprints ↓<br><b>S1</b> y <b>S2</b> (S3 y S4 solo si hicieran falta)</div>
+  </div>
+  <div class="list l-seg"><h2><span class="n">4</span>Seguimiento</h2>
+    <div class="card sm">Revisión de avance</div>
+    <div class="card sm">Pruebas de aceptación del sprint</div>
+    <div class="card sm dash">Problemas y cambios…</div>
+  </div>
+  <div class="list l-cierre"><h2><span class="n">5</span>Cierre</h2>
+    <div class="card sm">Integración final</div>
+    <div class="card sm">Entrega</div>
+    <div class="card sm">Retrospectiva</div>
+  </div>
+</div>
+
+<div class="sec">Dentro de Ejecución: un sprint por lista, cada historia es una tarjeta</div>
+<div class="row">
+  <div class="sprint"><h3>Ejecución · Sprint 1 <span style="font-weight:400;color:#51626f">(12–27 oct · 10 historias)</span></h3>
+    <div class="card"><span class="tag t-u">Usuario</span><br><b>H1</b> Crear cuenta</div>
+    <div class="card"><span class="tag t-u">Usuario</span><br><b>H2</b> Consultar perfil</div>
+    <div class="card"><span class="tag t-p">Publicaciones</span><br><b>H3</b> Añadir publicación</div>
+    <div class="card"><span class="tag t-p">Publicaciones</span><br><b>H4</b> Consultar publicación</div>
+    <div class="card sm dash">… H5 a H10</div>
+    <div class="card sm" style="background:#FFF1C9">Despliegue Sprint 1</div>
+  </div>
+  <div class="sprint"><h3>Ejecución · Sprint 2 <span style="font-weight:400;color:#51626f">(30 oct–4 nov · 10 historias)</span></h3>
+    <div class="card"><span class="tag t-p">Publicaciones</span><br><b>H11</b> Modificar publicación</div>
+    <div class="card"><span class="tag t-u">Usuario</span><br><b>H12</b> Modificar perfil</div>
+    <div class="card"><span class="tag t-p">Publicaciones</span><br><b>H13</b> Eliminar publicación</div>
+    <div class="card"><span class="tag t-c">Catálogo</span><br><b>H14</b> Consultar productos</div>
+    <div class="card sm dash">… H15 a H20</div>
+    <div class="card sm" style="background:#FFF1C9">Despliegue Sprint 2</div>
+  </div>
+  <div class="arrow">➜</div>
+  <div class="detail">
+    <h3>Al abrir una tarjeta de historia</h3>
+    <div class="cap">H1 · Crear cuenta · responsable, fecha límite y criterio de aceptación</div>
+    <div class="cap" style="font-weight:700;color:#1d2b36;margin-top:10px">Checklist «12 tareas»</div>
+    <span class="stage s-esp">Especificación</span>
+    <div class="chk">1. Funcional</div>
+    <div class="chk">2. No funcional</div>
+    <span class="stage s-dis">Diseño</span>
+    <div class="chk">3. Interfaz (HM)</div>
+    <div class="chk">4. Estudio de datos</div>
+    <div class="chk">5. Lógica</div>
+    <div class="chk">6. Arquitectura</div>
+    <span class="stage s-imp">Implementación y pruebas</span>
+    <div class="chk">7. Implementación</div>
+    <div class="chk">8. Prueba</div>
+    <div class="chk">9. Integración</div>
+    <div class="chk">10. Probar</div>
+    <div class="chk">11. Corregir</div>
+    <div class="chk">12. Pruebas</div>
+    <div class="nota">El despliegue no cuenta dentro de las 12 (por eso va en su propia tarjeta al final del sprint).</div>
+  </div>
+</div>
+</body></html>

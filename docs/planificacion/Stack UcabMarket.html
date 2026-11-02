@@ -1,0 +1,351 @@
+<title>Stack UcabMarket</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: ficha técnica de un proyecto — cabecera tipo etiqueta de precio, mapa de arquitectura, fichas por capa, matrices de HU y calidad */
+:root{
+  --bg:#f3f5f1; --surface:#ffffff; --ink:#15222c; --muted:#56646e; --line:#d6ddd8;
+  --accent:#2c4fd8; --accent-soft:#e6ebfc; --tag:#e0a106; --tag-soft:#fbf1d4; --ok:#1f7a55; --ok-soft:#e1f2ea;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#17212a; --ink:#e4ebef; --muted:#9aa8b2; --line:#2a3742;
+  --accent:#86a1ff; --accent-soft:#1f2a4d; --tag:#f2c14e; --tag-soft:#3a2f12; --ok:#5cc79a; --ok-soft:#173528; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#17212a; --ink:#e4ebef; --muted:#9aa8b2; --line:#2a3742;
+  --accent:#86a1ff; --accent-soft:#1f2a4d; --tag:#f2c14e; --tag-soft:#3a2f12; --ok:#5cc79a; --ok-soft:#173528; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:56px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+code,.mono{font-family:var(--f-mono);font-size:.88em}
+.eyebrow{font-family:var(--f-mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+section{display:grid;gap:20px}
+.lead{max-width:68ch;color:var(--muted)}
+
+/* Cabecera */
+header{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:32px;align-items:end}
+header h1{font-size:clamp(2.6rem,7vw,4.6rem);font-weight:800;letter-spacing:-.02em}
+header h1 span{color:var(--accent)}
+.thesis{font-size:1.15rem;max-width:44ch;margin-top:14px}
+.pricetag{position:relative;background:var(--tag-soft);border:2px solid var(--tag);border-radius:10px 10px 10px 10px;padding:18px 20px 18px 34px;display:grid;gap:6px}
+.pricetag::before{content:"";position:absolute;left:12px;top:50%;width:10px;height:10px;border-radius:50%;border:2px solid var(--tag);background:var(--bg);transform:translateY(-50%)}
+.pricetag .k{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.pricetag .v{font-family:var(--f-display);font-weight:700;font-size:1.25rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{font-family:var(--f-mono);font-size:.75rem;padding:3px 9px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+
+/* Arquitectura */
+.arch{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;overflow-x:auto}
+.arch svg{display:block;min-width:760px;width:100%;height:auto}
+.arch .box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.arch .box.front{fill:var(--accent-soft);stroke:var(--accent)}
+.arch .box.back{fill:var(--tag-soft);stroke:var(--tag)}
+.arch .box.data{fill:var(--ok-soft);stroke:var(--ok)}
+.arch .t{font-family:var(--f-display);font-weight:700;font-size:16px;fill:var(--ink)}
+.arch .s{font-family:var(--f-mono);font-size:12px;fill:var(--muted)}
+.arch .l{stroke:var(--ink);stroke-width:1.5;fill:none}
+.arch .ld{stroke:var(--muted);stroke-width:1.5;fill:none;stroke-dasharray:5 4}
+.arch .lab{font-family:var(--f-mono);font-size:11.5px;fill:var(--ink)}
+.arch .ah{fill:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:.85rem;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1.5px solid}
+
+/* Fichas */
+.layer{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;border-top:2px solid var(--ink);padding-top:18px}
+.layer-head{display:grid;gap:6px;align-content:start}
+.layer-head .badge{justify-self:start;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.badge.front{background:var(--accent-soft);color:var(--accent)}
+.badge.back{background:var(--tag-soft);color:var(--ink)}
+.badge.data{background:var(--ok-soft);color:var(--ok)}
+.badge.tools{background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.card-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.card h3{font-size:1.25rem}
+.role{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.why{display:grid;gap:4px}
+.why b{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.why ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.pick{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:.95rem}
+.pick b{color:var(--accent)}
+.vs{font-size:.88rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.vs b{color:var(--ink)}
+
+/* Tablas */
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.92rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.c{text-align:center}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.dot.half{background:transparent;border:2px solid var(--accent)}
+td .who{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);display:block}
+
+/* Calidad */
+.quality{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:8px;align-content:start}
+.q .iso{font-family:var(--f-mono);font-size:.74rem;color:var(--ok)}
+.q .brief{font-size:.88rem;color:var(--muted);font-style:italic}
+
+/* Pasos */
+.steps{display:grid;gap:12px;counter-reset:s;margin:0;padding:0;list-style:none}
+.steps li{counter-increment:s;display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start}
+.steps li::before{content:counter(s);font-family:var(--f-display);font-weight:800;font-size:1.1rem;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--bg)}
+pre{margin:6px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;font-family:var(--f-mono);font-size:.82rem;line-height:1.5}
+.tree{white-space:pre}
+
+.note{border-left:4px solid var(--tag);background:var(--tag-soft);padding:12px 16px;border-radius:0 8px 8px 0;font-size:.95rem}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
+
+@media (max-width:760px){
+  header{grid-template-columns:1fr}
+  .layer{grid-template-columns:1fr;gap:14px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .card{transition:transform .15s ease, border-color .15s ease}
+  .card:hover{transform:translateY(-2px);border-color:var(--accent)}
+}
+</style>
+
+<div class="wrap">
+
+<header>
+  <div>
+    <div class="eyebrow">Ingeniería de Software · UCAB · Equipo 87</div>
+    <h1>Stack <span>UcabMarket</span></h1>
+    <p class="thesis">Un solo lenguaje de punta a punta: JavaScript en el navegador y en el servidor, con datos en JSON. Cinco personas aprendiendo una sola cosa, bien.</p>
+  </div>
+  <div class="pricetag" aria-label="Resumen del stack">
+    <span class="k">frontend</span><span class="v">HTML · CSS · JS + Bootstrap</span>
+    <span class="k">backend</span><span class="v">Node.js + Express</span>
+    <span class="k">datos</span><span class="v">Archivos JSON</span>
+    <div class="chips"><span class="chip">Socket.IO</span><span class="chip">Multer</span><span class="chip">bcrypt</span><span class="chip">express-session</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="eyebrow">Cómo encaja todo</div>
+  <h2>Arquitectura en tres capas</h2>
+  <p class="lead">El navegador solo muestra y pide. El servidor decide (reglas de negocio, sesión, validaciones). La base de datos guarda. Cada capa se puede cambiar sin romper las otras, y eso es lo que luego permite aplicar tácticas arquitectónicas.</p>
+  <div class="arch">
+    <svg viewBox="0 0 980 360" role="img" aria-labelledby="archT archD">
+      <title id="archT">Arquitectura de UcabMarket</title>
+      <desc id="archD">El navegador con HTML, CSS, JavaScript y Bootstrap se comunica con el servidor Node.js y Express por HTTP con JSON y por Socket.IO para el chat. El servidor usa bcrypt y sesiones, Multer para archivos, y guarda los datos en archivos JSON y las fotos en una carpeta de archivos subidos.</desc>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <!-- Capa presentación -->
+      <rect class="box front" x="20" y="40" width="250" height="280" rx="14"/>
+      <text class="s" x="40" y="68">CAPA DE PRESENTACIÓN</text>
+      <text class="t" x="40" y="96">Navegador</text>
+      <text class="s" x="40" y="118">Chrome · Edge · Firefox</text>
+      <rect class="box" x="40" y="138" width="210" height="44" rx="8"/><text class="t" x="56" y="166" style="font-size:14px">HTML + CSS + JS</text>
+      <rect class="box" x="40" y="192" width="210" height="44" rx="8"/><text class="t" x="56" y="220" style="font-size:14px">Bootstrap</text>
+      <rect class="box" x="40" y="246" width="210" height="44" rx="8"/><text class="t" x="56" y="274" style="font-size:14px">Cliente Socket.IO</text>
+      <!-- Capa lógica -->
+      <rect class="box back" x="365" y="40" width="270" height="280" rx="14"/>
+      <text class="s" x="385" y="68">CAPA DE LÓGICA</text>
+      <text class="t" x="385" y="96">Servidor Node.js</text>
+      <text class="s" x="385" y="118">reglas de negocio de cada HU</text>
+      <rect class="box" x="385" y="138" width="230" height="44" rx="8"/><text class="t" x="401" y="166" style="font-size:14px">Express · rutas /api</text>
+      <rect class="box" x="385" y="192" width="110" height="44" rx="8"/><text class="t" x="399" y="220" style="font-size:14px">Socket.IO</text>
+      <rect class="box" x="505" y="192" width="110" height="44" rx="8"/><text class="t" x="519" y="220" style="font-size:14px">Multer</text>
+      <rect class="box" x="385" y="246" width="230" height="44" rx="8"/><text class="t" x="401" y="274" style="font-size:14px">bcrypt + sesiones</text>
+      <!-- Capa datos -->
+      <rect class="box data" x="730" y="40" width="230" height="280" rx="14"/>
+      <text class="s" x="750" y="68">CAPA DE DATOS</text>
+      <text class="t" x="750" y="96">Persistencia</text>
+      <text class="s" x="750" y="118">lo que se guarda</text>
+      <rect class="box" x="750" y="138" width="190" height="72" rx="8"/><text class="t" x="766" y="166" style="font-size:14px">Archivos JSON</text><text class="s" x="766" y="190">usuarios, productos, chats…</text>
+      <rect class="box" x="750" y="230" width="190" height="60" rx="8"/><text class="t" x="766" y="256" style="font-size:14px">/uploads</text><text class="s" x="766" y="277">fotos y archivos</text>
+      <!-- Flechas -->
+      <path class="l" d="M270 160 H365" marker-end="url(#ar)" marker-start="url(#ar)"/>
+      <text class="lab" x="281" y="150">HTTP · JSON</text>
+      <path class="ld" d="M270 268 H385" marker-end="url(#ar)" marker-start="url(#ar)"/>
+      <text class="lab" x="281" y="258">tiempo real</text>
+      <path class="l" d="M635 174 H750" marker-end="url(#ar)" marker-start="url(#ar)"/>
+      <text class="lab" x="648" y="164">lee y escribe</text>
+      <path class="l" d="M615 214 C680 214 690 260 750 260" marker-end="url(#ar)"/>
+      <text class="lab" x="650" y="252">guarda</text>
+    </svg>
+  </div>
+  <div class="legend">
+    <span><i style="background:var(--accent-soft);border-color:var(--accent)"></i>lo que ve el usuario</span>
+    <span><i style="background:var(--tag-soft);border-color:var(--tag)"></i>lo que decide el sistema</span>
+    <span><i style="background:var(--ok-soft);border-color:var(--ok)"></i>lo que se guarda</span>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Las herramientas, una por una</div>
+  <h2>Qué usamos, por qué es buena y por qué la elegimos</h2>
+
+  <div class="layer">
+    <div class="layer-head"><span class="badge front">Frontend</span><h3>Lo que ve el miembro UCAB</h3></div>
+    <div class="cards">
+      <article class="card">
+        <div class="card-top"><h3>HTML · CSS · JavaScript</h3><span class="role">estructura, estilo, lógica en pantalla</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Es el lenguaje nativo del navegador: no hay que compilar nada.</li><li>Funciona igual en Chrome, Edge y Firefox.</li><li>Todo lo demás de este stack se construye encima.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> ya está en la tarjeta Herramientas del equipo y es lo primero que todos saben o pueden aprender rápido.</p>
+        <p class="vs"><b>Descartamos React</b> por ahora: es potente, pero suma una curva de aprendizaje que este proyecto no necesita. Si alguien del equipo ya lo domina, se puede reconsiderar.</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Bootstrap</h3><span class="role">componentes de interfaz listos</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Trae botones, formularios, tarjetas, menús y modales ya diseñados.</li><li>Rejilla para acomodar el catálogo en columnas sin pelear con CSS.</li><li>Iconos propios (Bootstrap Icons) y documentación enorme.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> una interfaz consistente y clara sin ser diseñadores. Apoya el rango de calidad <b>Capacidad de interacción</b>.</p>
+        <p class="vs"><b>Descartamos Tailwind:</b> obliga a armar cada componente con clases utilitarias; Bootstrap da el componente terminado.</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-head"><span class="badge back">Backend</span><h3>Lo que decide el sistema</h3></div>
+    <div class="cards">
+      <article class="card">
+        <div class="card-top"><h3>Node.js + Express</h3><span class="role">servidor y rutas de la API</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>JavaScript también en el servidor: un solo lenguaje para todo el equipo.</li><li>Express es mínimo: una ruta como <code>POST /api/chats</code> son pocas líneas.</li><li>Recibe y responde JSON de forma natural.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> aquí viven las reglas de negocio de cada HU (sesión iniciada, máximo 5 fotos, solo el dueño modifica lo suyo). Un backend propio deja ver la arquitectura y aplicar tácticas como el TimeOut del audio de clase.</p>
+        <p class="vs"><b>Descartamos Firebase/Supabase:</b> hacen el backend por ti, y justo eso es lo que la materia pide diseñar.</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Socket.IO</h3><span class="role">chat en tiempo real</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Los mensajes llegan al instante, sin recargar la página.</li><li>Se monta sobre el mismo servidor Express.</li><li>Maneja reconexiones solo.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> la meta Chats del Brief es «coordinar la compra por mensajes». Es la pieza de <b>Crear Chat</b> y <b>Añadir Archivos</b>.</p>
+        <p class="vs"><b>Descartamos</b> refrescar cada pocos segundos: más carga al servidor y un chat que se siente lento.</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Multer</h3><span class="role">subida de fotos y archivos</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Recibe archivos en Express con una configuración corta.</li><li>Limita cantidad, tamaño y tipo de archivo en un solo lugar.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> cubre la restricción del Brief «máximo 5 fotos por publicación» (Añadir Producto) y los archivos del chat (Añadir Archivos).</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>bcrypt + express-session</h3><span class="role">seguridad de las cuentas</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>bcrypt guarda las claves cifradas: ni el equipo puede leerlas.</li><li>express-session recuerda quién inició sesión.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> el rango de <b>Seguridad → Integridad</b> (decisión del equipo): la sesión permite que solo cada miembro modifique o elimine lo suyo, y bcrypt guarda la clave encriptada. También permite aceptar solo correos UCAB al crear cuenta.</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-head"><span class="badge data">Datos</span><h3>Lo que se guarda</h3></div>
+    <div class="cards">
+      <article class="card">
+        <div class="card-top"><h3>Archivos JSON</h3><span class="role">datos guardados dentro del proyecto</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>No hay que instalar ni configurar ningún servidor de base de datos: son archivos de texto en la carpeta <code>db/</code>.</li><li>JavaScript los lee y los escribe directo (<code>JSON.parse</code> y <code>JSON.stringify</code>); es el mismo formato que viaja entre el navegador y el servidor.</li><li>Un archivo por conjunto: usuarios, productos, preguntas, chats, mensajes y reseñas.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> el sistema solo se va a correr en una máquina, así que no hace falta un servidor de base de datos. Las relaciones se guardan con ids: un chat guarda el id del producto y los ids de los dos miembros.</p>
+        <p class="vs"><b>Cuidado:</b> todo se lee y se escribe desde un solo módulo del servidor (<code>src/db.js</code>), que guarda el archivo completo en cada cambio. Si más adelante se publica en internet o lo usan muchas personas a la vez, se pasa a una base relacional (SQLite o PostgreSQL).</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-head"><span class="badge tools">Trabajo y diseño</span><h3>Con qué trabaja el equipo</h3></div>
+    <div class="cards">
+      <article class="card">
+        <div class="card-top"><h3>VS Code + Live Server</h3><span class="role">editor</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Gratis, rápido, con extensiones para todo el stack.</li><li>Live Server recarga la página al guardar.</li><li>Thunder Client (extensión) prueba la API sin salir del editor.</li></ul></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Git + GitHub</h3><span class="role">repositorio del equipo</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Cinco personas en el mismo código sin pisarse.</li><li>Historial de cada cambio, como el histórico de versiones del Brief.</li><li>GitHub Desktop si la consola intimida.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> es el «Repositorio Git» que ya está en la tarjeta Herramientas.</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Figma</h3><span class="role">diseño de la interfaz</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Pantallas clicables antes de programar.</li><li>Los cinco editan el mismo archivo a la vez.</li><li>Trae kits de componentes de Bootstrap, así lo diseñado coincide con lo programado.</li></ul></div>
+        <p class="pick"><b>Por qué la elegimos:</b> es el ítem «Diseño de la interfaz (HM)» del Flujo de Trabajo, y la profesora pidió que el producto coincida con el plano: «si hiciste un rancho, tiene que ser un rancho».</p>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>draw.io · Canva</h3><span class="role">diagramas y backlog</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>draw.io: diagramas de actividades, casos de uso y arquitectura, con enlace para compartir.</li><li>Canva: el backlog (story map) que ya tienen.</li></ul></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><h3>Ejecución local</h3><span class="role">correrlo en una máquina</span></div>
+        <div class="why"><b>Por qué es buena</b><ul><li>Basta con <code>node src/server.js</code> y abrir <code>http://localhost:3000</code> en el navegador.</li><li>No hay que pagar ni configurar hosting: para la demo basta la laptop de un integrante.</li><li>Los datos quedan en la carpeta <code>db/</code> y se pueden revisar a mano.</li></ul></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Sprint 1</div>
+  <h2>Qué herramienta pide cada historia</h2>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Historia de usuario</th><th class="c">Bootstrap</th><th class="c">Express</th><th class="c">Datos (JSON)</th><th class="c">Socket.IO</th><th class="c">Multer</th><th class="c">bcrypt / sesión</th></tr></thead>
+      <tbody>
+        <tr><td>Crear Cuenta<span class="who">Paola</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot"></span></td></tr>
+        <tr><td>Consultar Perfil<span class="who">Paola</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot half"></span></td></tr>
+        <tr><td>Añadir Producto<span class="who">Victoria</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot half"></span></td></tr>
+        <tr><td>Consultar Producto<span class="who">Victoria</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+        <tr><td>Añadir Preguntas<span class="who">Eliavalentina</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot half"></span></td></tr>
+        <tr><td>Consultar Preguntas<span class="who">Eliavalentina</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+        <tr><td>Crear Chat<span class="who">José</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"><span class="dot"></span></td></tr>
+        <tr><td>Añadir Archivos<span class="who">José</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot half"></span></td></tr>
+        <tr><td>Añadir Reseña<span class="who">Gabriel</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"><span class="dot half"></span></td></tr>
+        <tr><td>Consultar Reseña<span class="who">Gabriel</span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"><span class="dot"></span></td><td class="c"></td><td class="c"></td><td class="c"></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="legend"><span><span class="dot" style="margin-right:6px;vertical-align:-1px"></span>la usa directamente</span><span><span class="dot half" style="margin-right:6px;vertical-align:-1px"></span>solo verifica la sesión iniciada</span></div>
+</section>
+
+<section>
+  <div class="eyebrow">ISO/IEC 25010</div>
+  <h2>Cómo el stack cumple los rangos de calidad del Brief</h2>
+  <div class="quality">
+    <div class="q"><span class="iso">Capacidad de interacción → Operabilidad</span><h3>Sencilla de usar</h3><p class="brief">«Que la aplicación sea sencilla de usar»</p><p>Componentes de Bootstrap reconocibles, diseño probado en Figma antes de programar y mensajes claros en español.</p></div>
+    <div class="q"><span class="iso">Eficiencia de desempeño → Comportamiento temporal</span><h3>Catálogo rápido</h3><p class="brief">«Rápida en las funcionalidades del catálogo de productos»</p><p>El servidor carga los JSON en memoria al arrancar y el catálogo se pagina: Express responde solo los productos de la página que se ve.</p></div>
+    <div class="q"><span class="iso">Seguridad → Integridad</span><h3>Cuentas resguardadas</h3><p class="brief">«Que la información confidencial de las cuentas esté resguardada»</p><p>Solo cada miembro modifica o elimina lo suyo (el servidor lo valida con la sesión), las claves se guardan con bcrypt y el chat no muestra correo ni teléfono.</p></div>
+    <div class="q"><span class="iso">Flexibilidad → Adaptabilidad</span><h3>Varios navegadores</h3><p class="brief">«Que pueda abrir en varios navegadores web»</p><p>HTML, CSS y JavaScript estándar con Bootstrap: funcionan igual en Chrome, Edge y Firefox de escritorio.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Para arrancar</div>
+  <h2>Primeros pasos y estructura del proyecto</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Instalar y crear el proyecto</h3>
+      <ol class="steps">
+        <li><div>Instalar <b>Node.js</b> (versión LTS), <b>VS Code</b> y <b>Git</b>.</div></li>
+        <li><div>Crear el repositorio en GitHub y clonarlo.</div></li>
+        <li><div>Dentro de la carpeta del proyecto:<pre>npm init -y
+npm install express socket.io multer bcrypt express-session</pre></div></li>
+        <li><div>Cada integrante trabaja su HU en una rama propia y la une con un pull request.</div></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Carpetas por capa</h3>
+<pre class="tree">ucabmarket/
+├─ public/            ← presentación
+│  ├─ index.html      catálogo
+│  ├─ producto.html   detalle + «Contactar vendedor»
+│  ├─ chat.html
+│  ├─ css/  js/
+├─ src/               ← lógica
+│  ├─ server.js       Express + Socket.IO
+│  ├─ db.js           lee y guarda los JSON
+│  ├─ routes/         productos, chats, reseñas…
+│  └─ middleware/     sesión, Multer
+├─ db/                ← datos (JSON)
+│  ├─ usuarios.json   productos.json
+│  ├─ preguntas.json  chats.json
+│  └─ mensajes.json   resenas.json
+└─ uploads/           fotos y archivos</pre>
+    </div>
+  </div>
+</section>
+
+<p class="note"><b>Propuesta para decidir en equipo.</b> Antes de cambiar la tarjeta Herramientas del Trello, confírmenla entre los cinco. Si la profesora pide una tecnología concreta, esa indicación manda sobre este documento.</p>
+
+<footer>UcabMarket · Equipo 87 · Ingeniería de Software, UCAB · Base: Brief v1.6 (16/10/2026) y backlog del Sprint 1.</footer>
+</div>

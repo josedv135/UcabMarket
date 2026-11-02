@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Tabla 3C - Crear Chat</title><style>
+body{margin:0;background:#fff}
+#cap{display:inline-block;padding:4px;background:#fff}
+table{border-collapse:collapse;width:1080px;font-family:Calibri,Carlito,Arial,sans-serif;font-size:15px;color:#000;table-layout:fixed;background:#fff}
+th,td{border:1.5px solid #000;padding:7px 9px;vertical-align:top;text-align:left;line-height:1.32}
+th{font-size:15.5px}
+</style></head><body><div id="cap"><table><colgroup><col style="width:23%"><col style="width:42%"><col style="width:35%"></colgroup>
+<tr><th>1 Historia de Usuario</th><th>2 Conversación</th><th>3 Criterios de Aceptación</th></tr>
+<tr><td><b>Como</b> miembro de la comunidad UCAB, <b>quiero</b> crear un chat con el vendedor de un producto, <b>para</b> coordinar la compra por mensajes.</td><td><b>Épica:</b> Gestionar chats.<br><br>
+<b>Escenario de uso:</b> El miembro ve el detalle de un producto del catálogo y presiona «Contactar vendedor». El sistema le pide confirmar y, al presionar «Crear chat», crea la conversación privada con el vendedor y se la muestra. Ahí el miembro escribe su mensaje y lo envía, y puede seguir escribiendo. Si el chat no se pudo crear, el sistema avisa y vuelve a preguntar; si el miembro presiona «Salir», se cancela el proceso y regresa a Consultar producto.<br><br>
+<b>Reglas de negocio:</b><br>
+1. Solo pueden crear chats los miembros UCAB con sesión iniciada.<br>
+2. El chat no muestra datos personales de ninguno de los dos (correo, teléfono).<br>
+3. Solo los dos miembros del chat pueden escribir en él; nadie más puede modificar ni eliminar sus mensajes.<br><br>
+<b>Alcance:</b> Incluye crear el chat desde el detalle del producto, mostrarlo y enviar un mensaje en él. No incluye adjuntar archivos (HU Añadir Archivos).<br><br>
+<b>Dependencias:</b> Crear Cuenta (para tener sesión iniciada); Añadir producto (debe existir un producto publicado); Consultar producto (desde ahí se llega al botón).<br><br>
+<b>Otras restricciones:</b> Solo en español y en web de escritorio. Requisito no funcional (ISO/IEC 25010): <b>Seguridad → Integridad</b> (regla 3 y CA6).<br><br>
+<b>Diagrama de actividades:</b> ver el enlace debajo de esta tabla.</td><td><b>CA1 — Chat creado:</b> Dado que inicié sesión y estoy viendo un producto de otro miembro, cuando presiono «Contactar vendedor» y luego «Crear chat», entonces el sistema muestra «Chat creado» y, al presionar OK, me muestra el chat nuevo con el vendedor.<br><br>
+<b>CA2 — Salir:</b> Dado que el sistema me pide confirmar la creación, me avisa «Chat creado» o me muestra el chat, cuando presiono «Salir» en lugar de «Crear chat», OK o «Enviar», entonces se cancela el proceso y regreso a Consultar producto.<br><br>
+<b>CA3 — Sin datos personales:</b> Dado que se creó el chat, cuando lo veo, entonces se muestran solo los nombres de usuario y el producto, sin el correo ni el teléfono del vendedor ni los míos.<br><br>
+<b>CA4 — Enviar mensaje:</b> Dado que el chat está creado y lo estoy viendo, cuando escribo un mensaje y presiono «Enviar», entonces el sistema muestra mi mensaje actualizado en el chat y puedo seguir escribiendo.<br><br>
+<b>CA5 — No se pudo crear:</b> Dado que presioné «Crear chat», cuando el sistema no puede crear el chat, entonces muestra «No se pudo crear el chat, inténtalo de nuevo» y, al confirmar la lectura, me vuelve a preguntar si deseo crear el chat.<br><br>
+<b>CA6 — Chat protegido:</b> Dado que existe un chat entre dos miembros, cuando otro miembro que no pertenece al chat intenta escribir, modificar o eliminar mensajes en él, entonces el sistema no se lo permite.</td></tr></table></div></body></html>
