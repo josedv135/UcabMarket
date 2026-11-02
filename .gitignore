@@ -1,6 +1,28 @@
-node_modules/
-uploads/*
-!uploads/.gitkeep
-.env
+# Node / NestJS
+**/node_modules/
+**/dist/
+**/.env
+**/.env.local
+
+# Subidas de archivos
+backend/uploads/*
+!backend/uploads/.gitkeep
+!backend/uploads/products/.gitkeep
+!backend/uploads/chats/.gitkeep
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Sistema operativo
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
 __pycache__/

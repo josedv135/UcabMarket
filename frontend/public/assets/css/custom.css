@@ -1,0 +1,46 @@
+/* UcabMarket - Estilos Personalizados (Web de Escritorio) */
+:root {
+  --ucab-blue: #003366;
+  --ucab-gold: #f2a900;
+  --ucab-light: #f8fafc;
+  --ucab-card-border: #e2e8f0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--ucab-light);
+  color: #1e293b;
+  min-width: 1024px; /* Optimizado exclusivamente para web de escritorio */
+}
+
+.navbar-ucab {
+  background-color: var(--ucab-blue);
+}
+
+.btn-ucab {
+  background-color: var(--ucab-blue);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-ucab:hover {
+  background-color: #002244;
+  color: #ffffff;
+}
+
+.card-product {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--ucab-card-border);
+}
+
+.card-product:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.chat-box {
+  height: 500px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+}

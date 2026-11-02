@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Catálogo - UcabMarket</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark navbar-ucab px-4">
+    <a class="navbar-brand fw-bold" href="catalog.html">UcabMarket</a>
+    <div class="navbar-nav ms-auto align-items-center">
+      <a class="nav-link active" href="catalog.html"><i class="bi bi-grid me-1"></i> Catálogo</a>
+      <a class="nav-link" href="profile.html"><i class="bi bi-person me-1"></i> Mi Perfil</a>
+      <button class="btn btn-warning btn-sm ms-3 fw-bold" data-bs-toggle="modal" data-bs-target="#modalPublicar">
+        <i class="bi bi-plus-circle-fill me-1"></i> Publicar Producto
+      </button>
+      <button class="btn btn-outline-light btn-sm ms-3" onclick="api.clearSession(); window.location.href='index.html';">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="container my-5">
+    <!-- Barra de Búsqueda y Filtros -->
+    <div class="card border-0 shadow-sm p-3 mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-7">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="buscadorInput" class="form-control border-start-0" placeholder="Buscar libros, calculadoras, guías, laptops...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select id="filtroCategoria" class="form-select">
+            <option value="">Todas las categorías</option>
+            <option value="Libros y Guías">Libros y Guías</option>
+            <option value="Tecnología">Tecnología</option>
+            <option value="Útiles y Materiales">Útiles y Materiales</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button id="btnBuscar" class="btn btn-primary w-100">Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuadrícula de Productos -->
+    <div id="gridProductos" class="row g-4">
+      <!-- Renderizado dinámico vía products.js -->
+    </div>
+  </div>
+
+  <!-- Modal Publicar Producto (Máx 5 fotos) -->
+  <div class="modal fade" id="modalPublicar" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Publicar Nuevo Producto en UcabMarket</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="formPublicarProducto">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Título del Producto</label>
+              <input type="text" class="form-control" name="titulo" maxlength="100" required placeholder="Ej. Calculadora HP Prime v2">
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Precio ($ USD)</label>
+                <input type="number" step="0.01" min="0" class="form-control" name="precio" required placeholder="0.00">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Categoría</label>
+                <select class="form-select" name="categoria" required>
+                  <option value="Libros y Guías">Libros y Guías</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Útiles y Materiales">Útiles y Materiales</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Estado del Producto</label>
+              <select class="form-select" name="estadoProducto" required>
+                <option value="Nuevo">Nuevo</option>
+                <option value="Usado - Como nuevo">Usado - Como nuevo</option>
+                <option value="Usado - Buen estado">Usado - Buen estado</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Descripción detallada</label>
+              <textarea class="form-control" name="descripcion" rows="4" maxlength="1000" required placeholder="Describe detalles técnicos, tiempo de uso o lugar de entrega en campus..."></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Fotos del Producto (Hasta 5 imágenes)</label>
+              <input type="file" class="form-control" name="fotos" id="fotosInput" multiple accept=".jpg,.jpeg,.png,.webp">
+              <small class="text-muted">Formatos admitidos: JPG, PNG, WEBP. Máx 5 fotos (5MB cada una).</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Publicar Ahora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/products.js"></script>
+</body>
+</html>

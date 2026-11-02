@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+
+# Compilación
+dist/
+
+# Variables de entorno
+.env
+.env.local
+
+# Archivos subidos por usuarios (Multer)
+uploads/*
+!uploads/.gitkeep
+!uploads/products/.gitkeep
+!uploads/chats/.gitkeep
+
+# Registros y depuración
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

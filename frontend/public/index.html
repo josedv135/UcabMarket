@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenido - UcabMarket</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
+</head>
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+  <div class="card shadow-lg border-0 p-4" style="max-width: 480px; width: 100%;">
+    <div class="text-center mb-4">
+      <h2 class="fw-bold text-primary mb-1">UcabMarket</h2>
+      <p class="text-muted small">Marketplace exclusivo para la comunidad UCAB</p>
+      <div class="alert alert-info py-1 px-2 small mb-0">
+        <i class="bi bi-shield-lock me-1"></i> Acceso restringido con correo <strong>@ucab.edu.ve</strong>
+      </div>
+    </div>
+
+    <!-- Pestañas Login / Registro -->
+    <ul class="nav nav-pills nav-fill mb-4" id="authTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active fw-bold" id="tab-login-btn" data-bs-toggle="pill" data-bs-target="#tab-login">Iniciar Sesión</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link fw-bold" id="tab-reg-btn" data-bs-toggle="pill" data-bs-target="#tab-reg">Crear Cuenta</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <!-- Formulario Login -->
+      <div class="tab-pane fade show active" id="tab-login">
+        <form id="formLogin">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Correo Institucional UCAB</label>
+            <input type="email" class="form-control" id="loginEmail" placeholder="usuario@ucab.edu.ve" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Contraseña</label>
+            <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Ingresar al Marketplace</button>
+        </form>
+      </div>
+
+      <!-- Formulario Registro -->
+      <div class="tab-pane fade" id="tab-reg">
+        <form id="formRegistro">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Nombre Completo</label>
+            <input type="text" class="form-control" id="regNombre" placeholder="Ej. Juan Pérez" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Correo Institucional (@ucab.edu.ve obligatoria)</label>
+            <input type="email" class="form-control" id="regEmail" placeholder="jperez@ucab.edu.ve" pattern="^[a-zA-Z0-9._%+-]+@ucab\.edu\.ve$" title="Solo se permiten correos @ucab.edu.ve" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Carrera / Escuela</label>
+            <input type="text" class="form-control" id="regCarrera" placeholder="Ej. Ingeniería Informática" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Contraseña (Mínimo 6 caracteres)</label>
+            <input type="password" class="form-control" id="regPassword" minlength="6" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">Registrar Cuenta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

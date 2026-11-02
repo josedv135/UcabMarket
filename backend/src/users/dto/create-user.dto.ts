@@ -1,0 +1,25 @@
+import { IsEmail, IsNotEmpty, Matches, MinLength, IsString, IsOptional } from 'class-validator';
+
+export class CreateUserDto {
+  @IsNotEmpty({ message: 'El nombre completo es obligatorio' })
+  @IsString()
+  nombreCompleto: string;
+
+  @IsEmail({}, { message: 'El correo electrónico no es válido' })
+  @Matches(/^[a-zA-Z0-9._%+-]+@ucab\.edu\.ve$/, {
+    message: 'Registro restringido: El correo debe pertenecer al dominio institucional @ucab.edu.ve',
+  })
+  email: string;
+
+  @IsNotEmpty({ message: 'La contraseña es obligatoria' })
+  @MinLength(6, { message: 'La contraseña debe tener un mínimo de 6 caracteres' })
+  password: string;
+
+  @IsNotEmpty({ message: 'La carrera o facultad es requerida' })
+  @IsString()
+  carrera: string;
+
+  @IsOptional()
+  @IsString()
+  telefono?: string;
+}
