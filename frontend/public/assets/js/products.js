@@ -104,17 +104,10 @@ async function cargarDetalleProducto(id) {
       linkPerfil.href = `profile.html?userId=${prod.userId}`;
     }
 
-    // Botón de chat privado
+    // Botón de chat privado (HU Crear Chat, ver crear-chat.js)
     const btnChat = document.getElementById('btnContactarChat');
     if (btnChat) {
-      btnChat.addEventListener('click', async () => {
-        try {
-          const chat = await api.post('/chats', { productId: prod.id, sellerId: prod.userId });
-          window.location.href = `chat.html?chatId=${chat.id}`;
-        } catch (err) {
-          alert('Error al iniciar chat: ' + err.message);
-        }
-      });
+      btnChat.addEventListener('click', () => crearChat.iniciar(prod));
     }
 
     // Galería (máximo 5 fotos)
