@@ -63,3 +63,84 @@ body {
   height: 28px;
   width: auto;
 }
+
+/* Movimiento del carrito: entra rodando, da un saltito cada pocos segundos y acelera al pasar el mouse */
+@keyframes carrito-entra {
+  0%   { transform: translateX(-140px) rotate(0); opacity: 0; }
+  60%  { transform: translateX(10px) rotate(-6deg); opacity: 1; }
+  80%  { transform: translateX(-4px) rotate(3deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes carrito-salta {
+  0%, 80%, 100% { transform: translateY(0) rotate(0); }
+  85% { transform: translateY(-8px) rotate(-5deg); }
+  90% { transform: translateY(0) rotate(2deg); }
+  95% { transform: translateY(-3px) rotate(0); }
+}
+
+@keyframes carrito-acelera {
+  0%   { transform: translateX(0) rotate(0); }
+  25%  { transform: translateX(6px) rotate(-8deg); }
+  50%  { transform: translateX(-2px) rotate(4deg); }
+  75%  { transform: translateX(3px) rotate(-3deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+@keyframes sombra-carrito {
+  0%, 80%, 100% { transform: scaleX(1); opacity: 0.25; }
+  85% { transform: scaleX(0.7); opacity: 0.12; }
+}
+
+/* Inicio de sesión: entra y luego salta cada 4 s, con una sombra que acompaña el salto */
+.logo-carrito-entrada {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  transform-origin: bottom center;
+  animation: carrito-entra 0.9s cubic-bezier(.2,.8,.3,1.2) both,
+             carrito-salta 4s ease-in-out 1.2s infinite;
+  cursor: pointer;
+}
+
+.logo-carrito-entrada + h2 {
+  position: relative;
+}
+
+.logo-carrito-entrada + h2::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 70px;
+  height: 6px;
+  margin-left: -35px;
+  border-radius: 50%;
+  background: #0f2a36;
+  animation: sombra-carrito 4s ease-in-out 1.2s infinite;
+  opacity: 0.25;
+}
+
+.logo-carrito-entrada:hover {
+  animation: carrito-acelera 0.5s ease-in-out infinite;
+}
+
+/* Barra: entra rodando al cargar y acelera al pasar el mouse */
+.navbar-logo-icono img {
+  transform-origin: bottom center;
+  animation: carrito-entra 0.8s cubic-bezier(.2,.8,.3,1.2) both;
+}
+
+.navbar-logo:hover .navbar-logo-icono img {
+  animation: carrito-acelera 0.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-carrito-entrada,
+  .logo-carrito-entrada:hover,
+  .logo-carrito-entrada + h2::before,
+  .navbar-logo-icono img,
+  .navbar-logo:hover .navbar-logo-icono img {
+    animation: none;
+  }
+}
