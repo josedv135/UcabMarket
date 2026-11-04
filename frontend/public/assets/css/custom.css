@@ -44,3 +44,22 @@ body {
   background-color: #ffffff;
   border-radius: 8px;
 }
+
+/* Logo de UcabMarket: el carrito va en un recuadro blanco para que se lea sobre la barra azul */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-logo-icono {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 3px 6px;
+  line-height: 0;
+}
+
+.navbar-logo-icono img {
+  height: 28px;
+  width: auto;
+}
