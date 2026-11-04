@@ -32,7 +32,7 @@ async function bootstrap() {
   const allowedOrigins = Array.from(new Set([...defaultOrigins, ...envOrigins]));
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => { if (!origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) || allowedOrigins.includes(origin)) { callback(null, true); } else { callback(new Error("Bloqueado por CORS"), false); } },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

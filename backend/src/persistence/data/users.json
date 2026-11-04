@@ -7,5 +7,14 @@
     "carrera": "Ingenieria Informatica",
     "fechaRegistro": "2026-11-02T03:35:30.760Z",
     "telefono": "414-2289344"
+  },
+  {
+    "id": "1793762969453-0vb89n",
+    "nombreCompleto": "Eliavalentina Gonzalez",
+    "email": "egonzalez.25@ucab.edu.ve",
+    "password": "$2b$10$oMqHA4PuSVTvCShxNSg6LuezQOQeiLY81QQGnF9h9AxNjPtz6Y/Xq",
+    "carrera": "ingeniería informática",
+    "telefono": "04241438804",
+    "fechaRegistro": "2026-11-04T03:29:29.454Z"
   }
 ]
