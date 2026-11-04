@@ -2,67 +2,133 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bienvenido - UcabMarket</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="assets/css/custom.css">
 </head>
-<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-  <div class="card shadow-lg border-0 p-4" style="max-width: 480px; width: 100%;">
+<body class="d-flex align-items-center justify-content-center py-4" style="min-height: 100vh; background-color: #f4f6f9;">
+  <div class="card shadow-lg border-0 p-4" style="max-width: 500px; width: 100%; border-radius: 12px;">
     <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-2" style="width: 54px; height: 54px; font-size: 1.6rem;">
+        <i class="bi bi-shop"></i>
+      </div>
       <h2 class="fw-bold text-primary mb-1">UcabMarket</h2>
-      <p class="text-muted small">Marketplace exclusivo para la comunidad UCAB</p>
-      <div class="alert alert-info py-1 px-2 small mb-0">
-        <i class="bi bi-shield-lock me-1"></i> Acceso restringido con correo <strong>@ucab.edu.ve</strong>
+      <p class="text-muted small mb-2">Marketplace seguro para la comunidad ucabista</p>
+      <div class="alert alert-info py-1 px-3 small mb-0 d-inline-block">
+        <i class="bi bi-shield-check me-1"></i> Acceso exclusivo con correo <strong>@ucab.edu.ve</strong>
+      </div>
+    </div>
+
+    <!-- Contenedor de Alerta Dinámica -->
+    <div id="authAlert" class="alert d-none small py-2 mb-3" role="alert"></div>
+
+    <!-- Banner si ya existe sesión -->
+    <div id="sessionBanner" class="alert alert-light border small py-2 mb-3 d-none align-items-center justify-content-between">
+      <span><i class="bi bi-person-check-fill text-success me-1"></i> Sesión activa: <strong id="sessionUserName"></strong></span>
+      <div>
+        <a href="catalog.html" class="btn btn-sm btn-primary py-0 px-2">Ir al Catálogo</a>
+        <button id="btnLogoutBanner" class="btn btn-sm btn-outline-danger py-0 px-2 ms-1">Salir</button>
       </div>
     </div>
 
     <!-- Pestañas Login / Registro -->
     <ul class="nav nav-pills nav-fill mb-4" id="authTabs" role="tablist">
-      <li class="nav-item">
-        <button class="nav-link active fw-bold" id="tab-login-btn" data-bs-toggle="pill" data-bs-target="#tab-login">Iniciar Sesión</button>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-bold" id="tab-login-btn" data-bs-toggle="pill" data-bs-target="#tab-login" type="button" role="tab">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+        </button>
       </li>
-      <li class="nav-item">
-        <button class="nav-link fw-bold" id="tab-reg-btn" data-bs-toggle="pill" data-bs-target="#tab-reg">Crear Cuenta</button>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link fw-bold" id="tab-reg-btn" data-bs-toggle="pill" data-bs-target="#tab-reg" type="button" role="tab">
+          <i class="bi bi-person-plus me-1"></i> Crear Cuenta
+        </button>
       </li>
     </ul>
 
     <div class="tab-content">
       <!-- Formulario Login -->
-      <div class="tab-pane fade show active" id="tab-login">
+      <div class="tab-pane fade show active" id="tab-login" role="tabpanel">
         <form id="formLogin">
           <div class="mb-3">
             <label class="form-label small fw-semibold">Correo Institucional UCAB</label>
-            <input type="email" class="form-control" id="loginEmail" placeholder="usuario@ucab.edu.ve" required>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+              <input type="email" class="form-control" id="loginEmail" placeholder="usuario@ucab.edu.ve" required autocomplete="username">
+            </div>
+            <div class="form-text small">Debe pertenecer al dominio @ucab.edu.ve</div>
           </div>
           <div class="mb-3">
             <label class="form-label small fw-semibold">Contraseña</label>
-            <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+              <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Ingresar al Marketplace</button>
+          <button type="submit" id="btnLoginSubmit" class="btn btn-primary w-100 py-2 fw-semibold">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar al Marketplace
+          </button>
         </form>
       </div>
 
       <!-- Formulario Registro -->
-      <div class="tab-pane fade" id="tab-reg">
+      <div class="tab-pane fade" id="tab-reg" role="tabpanel">
         <form id="formRegistro">
           <div class="mb-3">
             <label class="form-label small fw-semibold">Nombre Completo</label>
-            <input type="text" class="form-control" id="regNombre" placeholder="Ej. Juan Pérez" required>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+              <input type="text" class="form-control" id="regNombre" placeholder="Ej. Paola De La Cruz" required>
+            </div>
           </div>
+
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Correo Institucional (@ucab.edu.ve obligatoria)</label>
-            <input type="email" class="form-control" id="regEmail" placeholder="jperez@ucab.edu.ve" pattern="^[a-zA-Z0-9._%+-]+@ucab\.edu\.ve$" title="Solo se permiten correos @ucab.edu.ve" required>
+            <label class="form-label small fw-semibold">Correo Institucional UCAB</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-envelope-at"></i></span>
+              <input type="email" class="form-control" id="regEmail" placeholder="estudiante@ucab.edu.ve" required>
+            </div>
+            <div class="form-text small text-muted">Obligatorio dominio @ucab.edu.ve</div>
           </div>
+
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Carrera / Escuela</label>
-            <input type="text" class="form-control" id="regCarrera" placeholder="Ej. Ingeniería Informática" required>
+            <label class="form-label small fw-semibold">Carrera o Escuela UCAB</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-mortarboard"></i></span>
+              <input type="text" class="form-control" id="regCarrera" placeholder="Ej. Ingeniería Informática" required>
+            </div>
           </div>
+
           <div class="mb-3">
-            <label class="form-label small fw-semibold">Contraseña (Mínimo 6 caracteres)</label>
-            <input type="password" class="form-control" id="regPassword" minlength="6" placeholder="••••••••" required>
+            <label class="form-label small fw-semibold">Teléfono de Contacto (Opcional)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+              <input type="text" class="form-control" id="regTelefono" placeholder="Ej. 0414 1234567">
+            </div>
+            <div class="form-text small text-muted">Facilita que otros estudiantes te contacten para intercambios.</div>
           </div>
-          <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">Registrar Cuenta</button>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label small fw-semibold">Contraseña</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="regPassword" minlength="6" placeholder="Mín. 6 caracteres" required autocomplete="new-password">
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label small fw-semibold">Confirmar Contraseña</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-lock-fill"></i></span>
+                <input type="password" class="form-control" id="regPasswordConfirm" minlength="6" placeholder="Repite la clave" required autocomplete="new-password">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btnRegSubmit" class="btn btn-success w-100 py-2 fw-semibold">
+            <i class="bi bi-person-check-fill me-1"></i> Registrar Cuenta
+          </button>
         </form>
       </div>
     </div>

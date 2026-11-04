@@ -1,8 +1,10 @@
-export class User {
+import { BaseEntity } from '../persistence/json-database.service';
+
+export class User implements BaseEntity {
   id: string;
   nombreCompleto: string;
   email: string;
-  passwordHash: string;
+  password?: string;
   carrera: string;
   telefono?: string;
   fotoPerfil?: string;

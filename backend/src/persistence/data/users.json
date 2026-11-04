@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "1793590530760-9nldja",
+    "nombreCompleto": "Paola De La Cruz",
+    "email": "pvdelacruz.25@ucab.edu.ve",
+    "password": "$2b$10$t6ijIiFxoiE4uEWlgEcQB.lZ3HEgG/JbnD1zl/TzlZQwiRwBPZurK",
+    "carrera": "Ingenieria Informatica",
+    "fechaRegistro": "2026-11-02T03:35:30.760Z",
+    "telefono": "414-2289344"
+  }
+]
