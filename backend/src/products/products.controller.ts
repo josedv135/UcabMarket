@@ -12,13 +12,27 @@ import {
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
-import { multerProductConfig } from './products.multer';
+import {
+  multerProductConfig,
+  descartarFotos,
+  MAX_FOTOS,
+  MAX_ARCHIVOS_RECIBIDOS,
+} from './products.multer';
+
+// Valida el cuerpo multipart de forma manual para poder borrar las fotos
+// subidas si los datos no son válidos (el pipe global corre después de multer).
+const validarProducto = new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+});
 
 @Controller('products')
 export class ProductsController {
@@ -37,35 +51,58 @@ export class ProductsController {
     return this.productsService.listarPorUsuario(userId);
   }
 
+  /**
+   * HU Consultar Producto: detalle de una publicación con los datos
+   * públicos del vendedor. Solo para miembros con sesión iniciada.
+   */
+  @UseGuards(AuthGuard)
   @Get(':id')
   async getById(@Param('id') id: string) {
-    return this.productsService.buscarPorId(id);
+    return this.productsService.consultar(id);
   }
 
+  /**
+   * CU Añadir Producto, paso 6: verifica el producto antes de mostrar
+   * el «Resumen de Producto». Responde 409 «Producto ya existente» (CA4).
+   */
+  @UseGuards(AuthGuard)
+  @Post('validar')
+  async validarNuevoProducto(@Body() dto: CreateProductDto, @Request() req: any) {
+    await this.productsService.verificarNuevo(req.user.id, dto);
+    return { valido: true };
+  }
+
+  /**
+   * CU Añadir Producto, paso 9: guarda el producto al presionar «Publicar».
+   */
   @UseGuards(AuthGuard)
   @Post()
-  @UseInterceptors(FilesInterceptor('fotos', 5, multerProductConfig))
+  @UseInterceptors(FilesInterceptor('fotos', MAX_ARCHIVOS_RECIBIDOS, multerProductConfig))
   async createProduct(
     @Body() body: any,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[] = [],
     @Request() req: any,
   ) {
-    if (!body.titulo || !body.descripcion || body.precio === undefined) {
-      throw new BadRequestException('Faltan datos obligatorios para publicar el producto');
+    try {
+      // Regla de negocio 2 / CA3
+      if (files.length > MAX_FOTOS) {
+        throw new BadRequestException(
+          `Error en las imágenes: se permiten como máximo ${MAX_FOTOS} fotos por publicación`,
+        );
+      }
+
+      // Regla de negocio 4 / CA2: no se guardan productos vacíos
+      const dto: CreateProductDto = await validarProducto.transform(body, {
+        type: 'body',
+        metatype: CreateProductDto,
+      });
+
+      const fotos = files.map((f) => f.filename);
+      return await this.productsService.crear(req.user.id, dto, fotos);
+    } catch (err) {
+      descartarFotos(files);
+      throw err;
     }
-
-    const fotosFilenames = files && files.length > 0 ? files.map((f) => f.filename) : [];
-
-    const dto: CreateProductDto = {
-      titulo: body.titulo,
-      descripcion: body.descripcion,
-      precio: Number(body.precio),
-      categoria: body.categoria || 'Otros',
-      estadoProducto: body.estadoProducto || 'Usado',
-      fotos: fotosFilenames,
-    };
-
-    return this.productsService.crear(req.user.id, dto, fotosFilenames);
   }
 
   @UseGuards(AuthGuard)

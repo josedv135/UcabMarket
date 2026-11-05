@@ -76,7 +76,9 @@ const api = {
       } else if (data?.error) {
         errorMsg = data.error;
       }
-      throw new Error(errorMsg);
+      const error = new Error(errorMsg);
+      error.status = response.status;
+      throw error;
     }
 
     return data;

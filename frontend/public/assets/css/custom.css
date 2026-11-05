@@ -144,3 +144,9 @@ body {
     animation: none;
   }
 }
+
+/* Consultar Producto: flechas de la galería visibles sobre fondo claro */
+#galeriaFotos .carousel-control-prev-icon,
+#galeriaFotos .carousel-control-next-icon {
+  filter: invert(1) grayscale(1);
+}
