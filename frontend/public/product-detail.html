@@ -105,12 +105,19 @@
           <div class="card border-0 shadow-sm p-4">
             <h4 class="fw-bold mb-3">Preguntas y Respuestas Públicas</h4>
 
+            <div id="alertaPreguntas"></div>
+
             <form id="formNuevaPregunta" class="mb-4">
               <div class="input-group">
-                <input type="text" id="inputNuevaPregunta" class="form-control" placeholder="Hazle una pregunta pública al vendedor..." required>
+                <input type="text" id="inputNuevaPregunta" class="form-control" placeholder="Hazle una pregunta pública al vendedor..." maxlength="300" required>
                 <button class="btn btn-primary px-4" type="submit">Preguntar</button>
               </div>
+              <div class="form-text text-end"><span id="contadorPregunta">0</span>/300</div>
             </form>
+
+            <p id="avisoVendedorPreguntas" class="text-muted fst-italic mb-4" hidden>
+              <i class="bi bi-info-circle me-1"></i> Esta es tu publicación: aquí puedes responder las preguntas de los compradores.
+            </p>
 
             <div id="contenedorPreguntas"></div>
           </div>
