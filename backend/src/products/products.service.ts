@@ -2,11 +2,23 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { JsonDatabaseService } from '../persistence/json-database.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.entity';
+import { User } from '../users/user.entity';
+
+/** Datos del vendedor que se muestran al consultar un producto (sin correo ni teléfono). */
+export interface VendedorPublico {
+  id: string;
+  nombreCompleto: string;
+  carrera?: string;
+}
+
+export type ProductoConsultado = Product & { vendedor: VendedorPublico | null };
 
 @Injectable()
 export class ProductsService {
@@ -48,6 +60,16 @@ export class ProductsService {
     return producto;
   }
 
+  /** HU Consultar Producto: el producto con los datos públicos de su vendedor. */
+  async consultar(id: string): Promise<ProductoConsultado> {
+    const producto = await this.buscarPorId(id);
+    const usuario = await this.db.buscarPorId<User & { id: string }>('users', producto.userId);
+    const vendedor = usuario
+      ? { id: usuario.id, nombreCompleto: usuario.nombreCompleto, carrera: usuario.carrera }
+      : null;
+    return { ...producto, vendedor };
+  }
+
   async listarPorUsuario(userId: string): Promise<Product[]> {
     const productos = await this.db.leer<Product>(this.coleccion);
     return productos
@@ -59,11 +81,38 @@ export class ProductsService {
       );
   }
 
+  /**
+   * Regla de negocio 4: no se permiten productos duplicados.
+   * Se considera duplicado si el mismo miembro ya tiene una publicación
+   * activa con el mismo título (sin distinguir mayúsculas, acentos ni espacios extra).
+   */
+  async existeDuplicado(userId: string, titulo: string): Promise<boolean> {
+    const clave = normalizarTitulo(titulo);
+    const productos = await this.db.leer<Product>(this.coleccion);
+    return productos.some(
+      (p) =>
+        p.userId === userId &&
+        p.estadoPublicacion !== 'ELIMINADO' &&
+        normalizarTitulo(p.titulo) === clave,
+    );
+  }
+
+  /** Paso 6 del CU Añadir Producto: verifica el producto antes del resumen. */
+  async verificarNuevo(userId: string, dto: CreateProductDto): Promise<void> {
+    if (await this.existeDuplicado(userId, dto.titulo)) {
+      throw new ConflictException('Producto ya existente');
+    }
+  }
+
+  /** Paso 9 del CU Añadir Producto: guarda el producto. */
   async crear(
     userId: string,
     dto: CreateProductDto,
     fotos: string[] = [],
   ): Promise<Product> {
+    // Se vuelve a verificar por si se publicó otro igual entre el resumen y el guardado
+    await this.verificarNuevo(userId, dto);
+
     const nuevoProducto: Product = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
       userId,
@@ -77,7 +126,12 @@ export class ProductsService {
       fechaCreacion: new Date().toISOString(),
     };
 
-    return this.db.insertar<Product>(this.coleccion, nuevoProducto);
+    try {
+      return await this.db.insertar<Product>(this.coleccion, nuevoProducto);
+    } catch {
+      // Flujo alterno 9.1: se perdió la conexión con el archivo de datos
+      throw new ServiceUnavailableException('Error de conexión');
+    }
   }
 
   async actualizar(
@@ -122,4 +176,13 @@ export class ProductsService {
     });
     return true;
   }
+}
+
+function normalizarTitulo(titulo: string): string {
+  return (titulo || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
 }
