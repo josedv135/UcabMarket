@@ -1,6 +1,10 @@
 /**
  * HU Crear Chat (José) — pasos 7 a 10 y salida 11, en tiempo real con Socket.IO.
+ * HU Añadir archivos (José) — adjunta fotos o documentos a la conversación.
  */
+const EXTENSIONES_ARCHIVO = ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'doc', 'docx', 'zip'];
+const MAX_TAMANO_ARCHIVO = 10 * 1024 * 1024; // 10 MB
+
 let socket = null;
 let chatActual = null;
 
@@ -19,6 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('chatForm').addEventListener('submit', enviarMensaje);
   document.getElementById('btnSalir').addEventListener('click', salir);
+  document.getElementById('btnAdjuntar').addEventListener('click', () => document.getElementById('archivoInput').click());
+  document.getElementById('archivoInput').addEventListener('change', adjuntarArchivo);
 
   try {
     // 7.- Muestra el chat (solo si soy uno de los dos miembros)
@@ -71,6 +77,43 @@ function enviarMensaje(e) {
   input.focus();
 }
 
+// HU Añadir archivos: valida, sube y el servidor lo muestra a los dos miembros por el socket
+async function adjuntarArchivo(e) {
+  const archivo = e.target.files[0];
+  e.target.value = ''; // permite volver a elegir el mismo archivo
+  if (!archivo || !chatActual) return;
+
+  const error = errorDeArchivo(archivo);
+  if (error) {
+    mostrarAviso(error);
+    return;
+  }
+
+  const btn = document.getElementById('btnAdjuntar');
+  btn.disabled = true;
+  ocultarAviso();
+  const formData = new FormData();
+  formData.append('archivo', archivo);
+  try {
+    await api.post(`/chats/${encodeURIComponent(chatActual.id)}/archivo`, formData);
+  } catch (err) {
+    mostrarAviso(err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function errorDeArchivo(archivo) {
+  const extension = archivo.name.split('.').pop().toLowerCase();
+  if (!EXTENSIONES_ARCHIVO.includes(extension)) {
+    return 'Formato no permitido. Solo se aceptan JPG, PNG, WEBP, PDF, Word o ZIP.';
+  }
+  if (archivo.size > MAX_TAMANO_ARCHIVO) {
+    return 'El archivo pesa más de 10 MB. Elige uno más liviano.';
+  }
+  return null;
+}
+
 // 11.- Salir: cancela y regresa a Consultar producto
 function salir() {
   if (socket) socket.disconnect();
@@ -88,12 +131,25 @@ function renderizarMensaje(mensaje) {
   div.className = `d-flex mb-3 ${esMio ? 'justify-content-end' : 'justify-content-start'}`;
   div.innerHTML = `
     <div class="p-3 rounded-3 shadow-sm ${esMio ? 'bg-primary text-white' : 'bg-light text-dark'}" style="max-width: 70%;">
-      <p class="mb-1">${escapeHtml(mensaje.texto)}</p>
+      ${contenidoMensaje(mensaje, esMio)}
       <small class="d-block text-end ${esMio ? 'text-white-50' : 'text-muted'}" style="font-size: 0.75rem;">${hora}</small>
     </div>
   `;
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
+}
+
+function contenidoMensaje(mensaje, esMio) {
+  if (!mensaje.archivoUrl) {
+    return `<p class="mb-1">${escapeHtml(mensaje.texto)}</p>`;
+  }
+
+  const url = `${CONFIG.UPLOAD_URL}/chats/${encodeURIComponent(mensaje.archivoUrl)}`;
+  const nombre = escapeHtml(mensaje.archivoNombre || mensaje.archivoUrl);
+  if (/\.(jpe?g|png|webp)$/i.test(mensaje.archivoUrl)) {
+    return `<a href="${url}" target="_blank" rel="noopener"><img src="${url}" alt="${nombre}" class="rounded d-block mb-1" style="max-width: 240px; max-height: 240px;"></a>`;
+  }
+  return `<a href="${url}" target="_blank" rel="noopener" class="d-block mb-1 ${esMio ? 'text-white' : 'text-dark'}"><i class="bi bi-file-earmark-arrow-down me-1"></i>${nombre}</a>`;
 }
 
 function actualizarVacio() {
@@ -105,6 +161,10 @@ function mostrarAviso(texto) {
   const aviso = document.getElementById('chatAviso');
   aviso.textContent = texto;
   aviso.hidden = false;
+}
+
+function ocultarAviso() {
+  document.getElementById('chatAviso').hidden = true;
 }
 
 function escapeHtml(text) {

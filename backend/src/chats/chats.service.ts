@@ -97,6 +97,25 @@ export class ChatsService {
     });
   }
 
+  /** HU Añadir archivos: guarda el archivo como un mensaje del miembro con sesión */
+  async guardarArchivo(
+    chatId: string,
+    authorId: string,
+    archivoUrl: string,
+    archivoNombre: string,
+  ): Promise<Message> {
+    await this.buscarChatDeMiembro(chatId, authorId);
+
+    return this.db.insertar<Message>('messages', {
+      id: '',
+      chatId,
+      authorId,
+      archivoUrl,
+      archivoNombre,
+      fecha: new Date().toISOString(),
+    });
+  }
+
   private async buscarChatDeMiembro(chatId: string, userId: string): Promise<Chat> {
     const chat = await this.db.buscarPorId<Chat>('chats', chatId);
     if (!chat) {
