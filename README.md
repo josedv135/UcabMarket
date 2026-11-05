@@ -1,6 +1,6 @@
 # UcabMarket 🛒
 **Marketplace Web para la Comunidad UCAB**  
-*Materia:* Ingeniería de Software – **Equipo 87** (5 integrantes)  
+*Materia:* Ingeniería de Software – **Equipo 87.2** (5 integrantes)  
 *Restricción de Acceso:* Exclusivo para usuarios con correo `@ucab.edu.ve`.  
 *Alcance:* Plataforma web de escritorio, idioma español.
 

@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs/promises';
+import * as fsSync from 'fs';
 import * as path from 'path';
 
 export interface BaseEntity {
@@ -9,7 +10,22 @@ export interface BaseEntity {
 
 @Injectable()
 export class JsonDatabaseService {
-  private readonly dataPath = path.resolve(process.cwd(), 'src', 'persistence', 'data');
+  private readonly dataPath: string;
+
+  constructor() {
+    const candidates = [
+      path.resolve(process.cwd(), 'src', 'persistence', 'data'),
+      path.resolve(process.cwd(), 'backend', 'src', 'persistence', 'data'),
+      path.resolve(__dirname, '..', '..', 'src', 'persistence', 'data'),
+      path.resolve(__dirname, 'data'),
+    ];
+    let found = candidates.find((dir) => fsSync.existsSync(dir));
+    if (!found) {
+      found = candidates[0];
+      fsSync.mkdirSync(found, { recursive: true });
+    }
+    this.dataPath = found;
+  }
 
   private getFilePath(filename: string): string {
     const cleanName = filename.endsWith('.json') ? filename : `${filename}.json`;
@@ -25,8 +41,8 @@ export class JsonDatabaseService {
       const content = await fs.readFile(filePath, 'utf-8');
       if (!content.trim()) return [];
       return JSON.parse(content) as T[];
-    } catch (error) {
-      if ((error as any).code === 'ENOENT') {
+    } catch (error: any) {
+      if (error.code === 'ENOENT') {
         // Si el archivo no existe, crearlo con un arreglo vacío
         await this.guardar(nombreArchivo, []);
         return [];
@@ -42,7 +58,7 @@ export class JsonDatabaseService {
     const filePath = this.getFilePath(nombreArchivo);
     try {
       await fs.writeFile(filePath, JSON.stringify(datos, null, 2), 'utf-8');
-    } catch (error) {
+    } catch (error: any) {
       throw new InternalServerErrorException(`Error al guardar en archivo ${nombreArchivo}: ${error.message}`);
     }
   }
@@ -52,7 +68,7 @@ export class JsonDatabaseService {
    */
   async buscarPorId<T extends BaseEntity>(nombreArchivo: string, id: string): Promise<T | null> {
     const coleccion = await this.leer<T>(nombreArchivo);
-    const encontrado = coleccion.find(item => item.id === id);
+    const encontrado = coleccion.find((item) => item.id === id);
     return encontrado || null;
   }
 
@@ -78,7 +94,7 @@ export class JsonDatabaseService {
     cambios: Partial<T>,
   ): Promise<T> {
     const coleccion = await this.leer<T>(nombreArchivo);
-    const index = coleccion.findIndex(item => item.id === id);
+    const index = coleccion.findIndex((item) => item.id === id);
     if (index === -1) {
       throw new NotFoundException(`Elemento con ID ${id} no encontrado en ${nombreArchivo}`);
     }
@@ -93,7 +109,7 @@ export class JsonDatabaseService {
    */
   async eliminar<T extends BaseEntity>(nombreArchivo: string, id: string): Promise<boolean> {
     const coleccion = await this.leer<T>(nombreArchivo);
-    const filtrados = coleccion.filter(item => item.id !== id);
+    const filtrados = coleccion.filter((item) => item.id !== id);
     if (filtrados.length === coleccion.length) {
       return false;
     }

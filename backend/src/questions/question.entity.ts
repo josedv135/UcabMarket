@@ -1,8 +1,12 @@
-export class Question {
+import { BaseEntity } from '../persistence/json-database.service';
+
+export class Question implements BaseEntity {
   id: string;
   productId: string;
-  autorId: string;
+  userId: string;
+  autorNombre: string;
   contenido: string;
   respuesta?: string;
-  fecha: string;
+  fechaPregunta: string;
+  fechaRespuesta?: string;
 }

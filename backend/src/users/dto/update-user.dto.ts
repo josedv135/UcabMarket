@@ -2,7 +2,7 @@ import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El nombre debe ser una cadena de texto' })
   nombreCompleto?: string;
 
   @IsOptional()
@@ -10,14 +10,14 @@ export class UpdateUserDto {
   password?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'La carrera debe ser una cadena de texto' })
   carrera?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El teléfono debe ser una cadena de texto' })
   telefono?: string;
 
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'La foto de perfil debe ser una URL o identificador válido' })
   fotoPerfil?: string;
 }

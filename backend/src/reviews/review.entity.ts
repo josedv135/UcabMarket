@@ -1,9 +1,12 @@
-export class Review {
+import { BaseEntity } from '../persistence/json-database.service';
+
+export class Review implements BaseEntity {
   id: string;
-  autorId: string;
+  authorId: string;
+  autorNombre: string;
   targetUserId: string;
-  productId?: string;
   puntuacion: number;
   comentario: string;
+  productId?: string;
   fecha: string;
 }
