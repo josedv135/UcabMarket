@@ -1,9 +1,7 @@
-import { BaseEntity } from '../persistence/json-database.service';
-
-export class Chat implements BaseEntity {
+export class Chat {
   id: string;
   productId: string;
-  sellerId: string;
-  buyerId: string;
+  compradorId: string;
+  vendedorId: string;
   fechaCreacion: string;
 }

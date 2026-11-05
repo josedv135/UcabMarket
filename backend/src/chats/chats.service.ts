@@ -1,133 +1,125 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
 import { JsonDatabaseService } from '../persistence/json-database.service';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { CreateMessageDto } from './dto/create-message.dto';
 import { Chat } from './chat.entity';
 import { Message } from './message.entity';
 
+const MAX_TEXTO = 1000;
+
+/** Vista del chat que se envía al cliente: solo nombres, nunca correo ni teléfono (regla 2, CA3) */
+export interface ChatVista {
+  id: string;
+  producto: { id: string; titulo: string };
+  comprador: { id: string; nombre: string };
+  vendedor: { id: string; nombre: string };
+  fechaCreacion: string;
+}
+
 @Injectable()
 export class ChatsService {
-  private readonly coleccionChats = 'chats';
-  private readonly coleccionMensajes = 'messages';
-
   constructor(private readonly db: JsonDatabaseService) {}
 
-  /**
-   * Valida si un usuario pertenece a los dos miembros autorizados de la conversación (ISO 25010)
-   */
-  async verificarMembresia(chatId: string, userId: string): Promise<boolean> {
-    const chat = await this.db.buscarPorId<Chat>(this.coleccionChats, chatId);
-    if (!chat) return false;
-    return chat.buyerId === userId || chat.sellerId === userId;
-  }
-
-  /**
-   * Crea una nueva sala de negociación o retorna la existente entre comprador y vendedor
-   */
-  async crearOBuscarChat(
-    buyerId: string,
-    sellerId: string,
-    productId: string,
-  ): Promise<Chat> {
-    if (buyerId === sellerId) {
-      throw new BadRequestException(
-        'No puedes iniciar una conversación contigo mismo',
-      );
+  /** Paso 4: crea el chat entre el miembro y el vendedor del producto */
+  async crearChat(productId: string, compradorId: string): Promise<ChatVista> {
+    const producto = await this.db.buscarPorId<any>('products', productId);
+    if (!producto) {
+      throw new NotFoundException('No se pudo crear el chat: el producto no existe');
     }
 
-    const chats = await this.db.leer<Chat>(this.coleccionChats);
+    const vendedorId: string = producto.vendedorId ?? producto.userId;
+    if (!vendedorId) {
+      throw new BadRequestException('No se pudo crear el chat: el producto no tiene vendedor');
+    }
+    if (vendedorId === compradorId) {
+      throw new BadRequestException('No puedes crear un chat contigo mismo sobre tu propio producto');
+    }
+
+    // Si ya existe un chat de este miembro por este producto, se reutiliza
+    const chats = await this.db.leer<Chat>('chats');
     const existente = chats.find(
-      (c) =>
-        c.productId === productId &&
-        ((c.buyerId === buyerId && c.sellerId === sellerId) ||
-          (c.buyerId === sellerId && c.sellerId === buyerId)),
+      (c) => c.productId === productId && c.compradorId === compradorId,
     );
-
     if (existente) {
-      return existente;
+      return this.armarVista(existente);
     }
 
-    const nuevoChat: Chat = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+    const chat = await this.db.insertar<Chat>('chats', {
+      id: '',
       productId,
-      sellerId,
-      buyerId,
+      compradorId,
+      vendedorId,
       fechaCreacion: new Date().toISOString(),
-    };
-
-    return this.db.insertar<Chat>(this.coleccionChats, nuevoChat);
+    });
+    return this.armarVista(chat);
   }
 
-  /**
-   * Obtiene la información de un chat verificando que el solicitante sea participante
-   */
-  async obtenerChatPorId(chatId: string, userId: string): Promise<Chat> {
-    const chat = await this.db.buscarPorId<Chat>(this.coleccionChats, chatId);
+  /** Paso 7: muestra el chat, solo a sus dos miembros */
+  async obtenerChat(chatId: string, userId: string): Promise<ChatVista> {
+    const chat = await this.buscarChatDeMiembro(chatId, userId);
+    return this.armarVista(chat);
+  }
+
+  async listarMensajes(chatId: string, userId: string): Promise<Message[]> {
+    await this.buscarChatDeMiembro(chatId, userId);
+    const mensajes = await this.db.leer<Message>('messages');
+    return mensajes
+      .filter((m) => m.chatId === chatId)
+      .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }
+
+  /** Solo los dos miembros del chat pueden entrar y escribir (Seguridad → Integridad) */
+  async verificarMembresia(chatId: string, userId: string): Promise<boolean> {
+    const chat = await this.db.buscarPorId<Chat>('chats', chatId);
+    return !!chat && (chat.compradorId === userId || chat.vendedorId === userId);
+  }
+
+  /** Paso 10: guarda el mensaje. El autor viene del token, nunca del cliente. */
+  async guardarMensaje(chatId: string, authorId: string, texto: string): Promise<Message> {
+    const limpio = (texto ?? '').trim();
+    if (!limpio) {
+      throw new BadRequestException('El mensaje no puede estar vacío');
+    }
+    if (limpio.length > MAX_TEXTO) {
+      throw new BadRequestException(`El mensaje no puede superar ${MAX_TEXTO} caracteres`);
+    }
+    await this.buscarChatDeMiembro(chatId, authorId);
+
+    return this.db.insertar<Message>('messages', {
+      id: '',
+      chatId,
+      authorId,
+      texto: limpio,
+      fecha: new Date().toISOString(),
+    });
+  }
+
+  private async buscarChatDeMiembro(chatId: string, userId: string): Promise<Chat> {
+    const chat = await this.db.buscarPorId<Chat>('chats', chatId);
     if (!chat) {
-      throw new NotFoundException(`Chat con ID ${chatId} no encontrado`);
+      throw new NotFoundException('El chat no existe');
     }
-
-    if (chat.buyerId !== userId && chat.sellerId !== userId) {
-      throw new ForbiddenException(
-        'Seguridad ISO 25010: Acceso denegado a esta conversación privada',
-      );
+    if (chat.compradorId !== userId && chat.vendedorId !== userId) {
+      throw new ForbiddenException('No perteneces a este chat');
     }
-
     return chat;
   }
 
-  /**
-   * Lista los mensajes del chat en orden cronológico
-   */
-  async obtenerMensajes(chatId: string, userId: string): Promise<Message[]> {
-    const esMiembro = await this.verificarMembresia(chatId, userId);
-    if (!esMiembro) {
-      throw new ForbiddenException(
-        'Seguridad ISO 25010: No tienes permiso para leer los mensajes de este chat',
-      );
-    }
-
-    const mensajes = await this.db.leer<Message>(this.coleccionMensajes);
-    return mensajes
-      .filter((m) => m.chatId === chatId)
-      .sort(
-        (a, b) =>
-          new Date(a.fecha).getTime() - new Date(b.fecha).getTime(),
-      );
-  }
-
-  /**
-   * Guarda un mensaje enviado en messages.json
-   */
-  async guardarMensaje(data: CreateMessageDto): Promise<Message> {
-    const nuevoMensaje: Message = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
-      chatId: data.chatId,
-      authorId: data.authorId,
-      texto: data.texto ? data.texto.trim() : undefined,
-      archivoUrl: data.archivoUrl || undefined,
-      fecha: data.fecha || new Date().toISOString(),
+  private async armarVista(chat: Chat): Promise<ChatVista> {
+    const [producto, comprador, vendedor] = await Promise.all([
+      this.db.buscarPorId<any>('products', chat.productId),
+      this.db.buscarPorId<any>('users', chat.compradorId),
+      this.db.buscarPorId<any>('users', chat.vendedorId),
+    ]);
+    return {
+      id: chat.id,
+      producto: { id: chat.productId, titulo: producto?.titulo ?? 'Producto' },
+      comprador: { id: chat.compradorId, nombre: comprador?.nombreCompleto ?? 'Miembro UCAB' },
+      vendedor: { id: chat.vendedorId, nombre: vendedor?.nombreCompleto ?? 'Miembro UCAB' },
+      fechaCreacion: chat.fechaCreacion,
     };
-
-    return this.db.insertar<Message>(this.coleccionMensajes, nuevoMensaje);
-  }
-
-  /**
-   * Lista todos los chats donde participa el usuario
-   */
-  async obtenerChatsUsuario(userId: string): Promise<Chat[]> {
-    const chats = await this.db.leer<Chat>(this.coleccionChats);
-    return chats
-      .filter((c) => c.buyerId === userId || c.sellerId === userId)
-      .sort(
-        (a, b) =>
-          new Date(b.fechaCreacion).getTime() -
-          new Date(a.fechaCreacion).getTime(),
-      );
   }
 }

@@ -1,126 +1,113 @@
 /**
- * Lógica del chat en tiempo real para UcabMarket
- * Conexión mediante cliente Socket.IO (CDN jsDelivr)
+ * HU Crear Chat (José) — pasos 7 a 10 y salida 11, en tiempo real con Socket.IO.
  */
 let socket = null;
-let currentChatId = null;
+let chatActual = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const user = api.getCurrentUser();
-  if (!user) {
+  if (!user || !api.getToken()) {
     window.location.href = 'index.html';
     return;
   }
 
-  // Obtener chatId de la URL (?chatId=...)
-  const params = new URLSearchParams(window.location.search);
-  currentChatId = params.get('chatId');
+  const chatId = new URLSearchParams(window.location.search).get('chatId');
+  if (!chatId) {
+    mostrarAviso('No se indicó qué chat abrir.');
+    return;
+  }
 
-  // Inicializar la conexión Socket.IO usando CONFIG.SOCKET_URL
-  inicializarSocket(user);
+  document.getElementById('chatForm').addEventListener('submit', enviarMensaje);
+  document.getElementById('btnSalir').addEventListener('click', salir);
 
-  // Configurar listeners de interfaz
-  const chatForm = document.getElementById('chatForm');
-  if (chatForm) {
-    chatForm.addEventListener('submit', enviarMensaje);
+  try {
+    // 7.- Muestra el chat (solo si soy uno de los dos miembros)
+    chatActual = await api.get(`/chats/${encodeURIComponent(chatId)}`);
+    pintarEncabezado(user);
+    const mensajes = await api.get(`/chats/${encodeURIComponent(chatId)}/messages`);
+    mensajes.forEach(renderizarMensaje);
+    actualizarVacio();
+    conectarSocket();
+  } catch (err) {
+    mostrarAviso(err.message);
+    document.getElementById('btnEnviar').disabled = true;
   }
 });
 
-function inicializarSocket(user) {
-  // Conexión al servidor WebSocket de NestJS
+function pintarEncabezado(user) {
+  const otro = chatActual.comprador.id === user.id ? chatActual.vendedor : chatActual.comprador;
+  document.getElementById('chatTitulo').textContent = `Chat con ${otro.nombre}`;
+  document.getElementById('chatProducto').textContent = `Producto: ${chatActual.producto.titulo}`;
+}
+
+function conectarSocket() {
   socket = io(CONFIG.SOCKET_URL, {
-    auth: {
-      token: api.getToken(),
-    },
+    auth: { token: api.getToken() },
     transports: ['websocket', 'polling'],
   });
 
   socket.on('connect', () => {
-    console.log('[Socket.IO] Conectado al servidor con ID:', socket.id);
-    if (currentChatId) {
-      // Unirse a la sala privada del chat (validado por ISO 25010 en backend)
-      socket.emit('joinChat', {
-        chatId: currentChatId,
-        userId: user.id,
-      });
-    }
+    socket.emit('joinChat', { chatId: chatActual.id });
   });
 
-  // Escuchar nuevos mensajes entrantes sin recargar la página
+  // 10.- Muestra el mensaje actualizado, a los dos miembros, sin recargar
   socket.on('newMessage', (mensaje) => {
     renderizarMensaje(mensaje);
+    actualizarVacio();
   });
 
-  // Manejo de errores de autorización/seguridad
-  socket.on('error', (err) => {
-    alert(err.message || 'Error en el chat');
-  });
+  socket.on('chatError', (err) => mostrarAviso(err.message));
 }
 
-async function enviarMensaje(e) {
+// 9.- Presiona «Enviar»
+function enviarMensaje(e) {
   e.preventDefault();
-  const inputTexto = document.getElementById('mensajeInput');
-  const inputArchivo = document.getElementById('archivoInput');
-  const user = api.getCurrentUser();
+  const input = document.getElementById('mensajeInput');
+  const texto = input.value.trim();
+  if (!texto || !socket) return;
 
-  const texto = inputTexto ? inputTexto.value.trim() : '';
-  const archivo = inputArchivo?.files?.[0];
+  socket.emit('sendMessage', { chatId: chatActual.id, texto });
+  input.value = '';
+  input.focus();
+}
 
-  if (!texto && !archivo) return;
-
-  let archivoUrl = null;
-
-  // Si incluye archivo adjunto, se sube primero vía endpoint Multer
-  if (archivo) {
-    const formData = new FormData();
-    formData.append('file', archivo);
-    try {
-      const res = await api.post('/chats/upload', formData);
-      archivoUrl = res.url;
-    } catch (err) {
-      alert('Error al subir archivo adjunto: ' + err.message);
-      return;
-    }
-  }
-
-  // Emitir evento por Socket.IO para entrega instantánea
-  socket.emit('sendMessage', {
-    chatId: currentChatId,
-    authorId: user.id,
-    texto,
-    archivoUrl,
-    fecha: new Date().toISOString(),
-  });
-
-  if (inputTexto) inputTexto.value = '';
-  if (inputArchivo) inputArchivo.value = '';
+// 11.- Salir: cancela y regresa a Consultar producto
+function salir() {
+  if (socket) socket.disconnect();
+  window.location.href = chatActual
+    ? `product-detail.html?id=${encodeURIComponent(chatActual.producto.id)}`
+    : 'catalog.html';
 }
 
 function renderizarMensaje(mensaje) {
   const container = document.getElementById('mensajesContainer');
-  if (!container) return;
-
-  const user = api.getCurrentUser();
-  const esMio = mensaje.authorId === user.id;
+  const esMio = mensaje.authorId === api.getCurrentUser().id;
+  const hora = new Date(mensaje.fecha).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
 
   const div = document.createElement('div');
   div.className = `d-flex mb-3 ${esMio ? 'justify-content-end' : 'justify-content-start'}`;
-
-  const hora = new Date(mensaje.fecha || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
   div.innerHTML = `
     <div class="p-3 rounded-3 shadow-sm ${esMio ? 'bg-primary text-white' : 'bg-light text-dark'}" style="max-width: 70%;">
-      ${mensaje.texto ? `<p class="mb-1">${escapeHtml(mensaje.texto)}</p>` : ''}
-      ${mensaje.archivoUrl ? `<a href="${CONFIG.UPLOAD_URL}/chats/${mensaje.archivoUrl}" target="_blank" class="${esMio ? 'text-white text-decoration-underline' : 'text-primary'}">📎 Ver archivo adjunto</a>` : ''}
+      <p class="mb-1">${escapeHtml(mensaje.texto)}</p>
       <small class="d-block text-end ${esMio ? 'text-white-50' : 'text-muted'}" style="font-size: 0.75rem;">${hora}</small>
     </div>
   `;
-
   container.appendChild(div);
   container.scrollTop = container.scrollHeight;
 }
 
+function actualizarVacio() {
+  const hayMensajes = document.querySelectorAll('#mensajesContainer > .d-flex').length > 0;
+  document.getElementById('chatVacio').hidden = hayMensajes;
+}
+
+function mostrarAviso(texto) {
+  const aviso = document.getElementById('chatAviso');
+  aviso.textContent = texto;
+  aviso.hidden = false;
+}
+
 function escapeHtml(text) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
+  return String(text ?? '').replace(/[&<>"']/g, (m) => map[m]);
 }
