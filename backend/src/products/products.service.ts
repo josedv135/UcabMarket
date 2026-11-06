@@ -20,13 +20,15 @@ export interface VendedorPublico {
 
 export type ProductoConsultado = Product & { vendedor: VendedorPublico | null };
 
+const MAX_POR_PAGINA = 50;
+
 @Injectable()
 export class ProductsService {
   private readonly coleccion = 'products';
 
   constructor(private readonly db: JsonDatabaseService) {}
 
-  async listar(q?: string, categoria?: string): Promise<Product[]> {
+  async listar(q?: string, categoria?: string, pagina?: number, limite?: number): Promise<Product[]> {
     const productos = await this.db.leer<Product>(this.coleccion);
     let filtrados = productos.filter((p) => p.estadoPublicacion !== 'ELIMINADO');
 
@@ -46,10 +48,18 @@ export class ProductsService {
     }
 
     // Ordenar de más reciente a más antiguo
-    return filtrados.sort(
+    const ordenados = filtrados.sort(
       (a, b) =>
         new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime(),
     );
+
+    // Con «limite» devuelve una página; así el navegador no recibe todo el catálogo
+    if (limite > 0) {
+      const tamano = Math.min(limite, MAX_POR_PAGINA);
+      const inicio = (Math.max(pagina || 1, 1) - 1) * tamano;
+      return ordenados.slice(inicio, inicio + tamano);
+    }
+    return ordenados;
   }
 
   async buscarPorId(id: string): Promise<Product> {
@@ -114,7 +124,7 @@ export class ProductsService {
     await this.verificarNuevo(userId, dto);
 
     const nuevoProducto: Product = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      id: '',
       userId,
       titulo: dto.titulo.trim(),
       descripcion: dto.descripcion.trim(),

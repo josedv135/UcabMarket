@@ -46,7 +46,7 @@ export class QuestionsService {
     }
 
     const nuevaPregunta: Question = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      id: '',
       productId: dto.productId,
       userId,
       autorNombre: autorNombre || 'Estudiante UCAB',

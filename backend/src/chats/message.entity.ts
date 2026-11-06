@@ -6,5 +6,6 @@ export class Message implements BaseEntity {
   authorId: string;
   texto?: string;
   archivoUrl?: string;
+  archivoNombre?: string;
   fecha: string;
 }

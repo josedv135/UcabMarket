@@ -9,7 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
-import { usuarioId } from './chats.controller';
+import { Message } from './message.entity';
 
 @WebSocketGateway({
   cors: {
@@ -29,7 +29,7 @@ export class ChatsGateway implements OnGatewayConnection {
   handleConnection(client: Socket) {
     try {
       const payload = this.jwtService.verify(client.handshake.auth?.token);
-      client.data.userId = usuarioId(payload);
+      client.data.userId = payload.id;
     } catch {
       client.emit('chatError', { message: 'Debes iniciar sesión para usar el chat' });
       client.disconnect();
@@ -50,6 +50,11 @@ export class ChatsGateway implements OnGatewayConnection {
     client.join(`chat_${payload.chatId}`);
   }
 
+  /** Muestra un mensaje a los dos miembros de la sala sin recargar */
+  emitirMensaje(chatId: string, mensaje: Message) {
+    this.server.to(`chat_${chatId}`).emit('newMessage', mensaje);
+  }
+
   /** Paso 9-10: envía el mensaje y lo muestra a los dos miembros sin recargar */
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
@@ -59,7 +64,7 @@ export class ChatsGateway implements OnGatewayConnection {
     // CA6: el autor es siempre quien tiene la sesión, no lo que diga el cliente
     try {
       const mensaje = await this.chatsService.guardarMensaje(data?.chatId, client.data.userId, data?.texto);
-      this.server.to(`chat_${data.chatId}`).emit('newMessage', mensaje);
+      this.emitirMensaje(data.chatId, mensaje);
     } catch (err) {
       client.emit('chatError', { message: err.message });
     }

@@ -35,8 +35,10 @@ export class UsersService {
     return sinPassword;
   }
 
-  async buscarPorIdConPassword(id: string): Promise<User | null> {
-    return this.db.buscarPorId<User>(this.coleccion, id);
+  /** Perfil visible para otros miembros: sin correo ni teléfono */
+  async perfilPublico(id: string) {
+    const { email, telefono, ...publico } = await this.buscarPorId(id);
+    return publico;
   }
 
   async registrar(dto: CreateUserDto): Promise<Omit<User, 'password'>> {
@@ -56,7 +58,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
 
     const nuevoUsuario: User = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      id: '',
       nombreCompleto: dto.nombreCompleto.trim(),
       email: emailNormalizado,
       password: hashedPassword,
@@ -114,8 +116,4 @@ export class UsersService {
     return resultado;
   }
 
-  async listarTodos(): Promise<Omit<User, 'password'>[]> {
-    const usuarios = await this.db.leer<User>(this.coleccion);
-    return usuarios.map(({ password, ...resto }) => resto);
-  }
 }

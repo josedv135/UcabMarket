@@ -7,6 +7,8 @@ import {
 import { JsonDatabaseService } from '../persistence/json-database.service';
 import { Chat } from './chat.entity';
 import { Message } from './message.entity';
+import { Product } from '../products/product.entity';
+import { User } from '../users/user.entity';
 
 const MAX_TEXTO = 1000;
 
@@ -25,12 +27,12 @@ export class ChatsService {
 
   /** Paso 4: crea el chat entre el miembro y el vendedor del producto */
   async crearChat(productId: string, compradorId: string): Promise<ChatVista> {
-    const producto = await this.db.buscarPorId<any>('products', productId);
+    const producto = await this.db.buscarPorId<Product>('products', productId);
     if (!producto) {
       throw new NotFoundException('No se pudo crear el chat: el producto no existe');
     }
 
-    const vendedorId: string = producto.vendedorId ?? producto.userId;
+    const vendedorId = producto.userId;
     if (!vendedorId) {
       throw new BadRequestException('No se pudo crear el chat: el producto no tiene vendedor');
     }
@@ -97,6 +99,25 @@ export class ChatsService {
     });
   }
 
+  /** HU Añadir archivos: guarda el archivo como un mensaje del miembro con sesión */
+  async guardarArchivo(
+    chatId: string,
+    authorId: string,
+    archivoUrl: string,
+    archivoNombre: string,
+  ): Promise<Message> {
+    await this.buscarChatDeMiembro(chatId, authorId);
+
+    return this.db.insertar<Message>('messages', {
+      id: '',
+      chatId,
+      authorId,
+      archivoUrl,
+      archivoNombre,
+      fecha: new Date().toISOString(),
+    });
+  }
+
   private async buscarChatDeMiembro(chatId: string, userId: string): Promise<Chat> {
     const chat = await this.db.buscarPorId<Chat>('chats', chatId);
     if (!chat) {
@@ -110,9 +131,9 @@ export class ChatsService {
 
   private async armarVista(chat: Chat): Promise<ChatVista> {
     const [producto, comprador, vendedor] = await Promise.all([
-      this.db.buscarPorId<any>('products', chat.productId),
-      this.db.buscarPorId<any>('users', chat.compradorId),
-      this.db.buscarPorId<any>('users', chat.vendedorId),
+      this.db.buscarPorId<Product>('products', chat.productId),
+      this.db.buscarPorId<User>('users', chat.compradorId),
+      this.db.buscarPorId<User>('users', chat.vendedorId),
     ]);
     return {
       id: chat.id,

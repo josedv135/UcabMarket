@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -9,9 +10,8 @@ import { UsersModule } from '../users/users.module';
   imports: [
     forwardRef(() => UsersModule),
     JwtModule.register({
-      secret:
-        process.env.JWT_SECRET ||
-        'clave_secreta_segura_ucab_market_equipo87_2026',
+      // Sin JWT_SECRET en .env se usa una clave temporal: las sesiones duran hasta reiniciar
+      secret: process.env.JWT_SECRET || randomBytes(32).toString('hex'),
       signOptions: {
         expiresIn: '7d',
       },
