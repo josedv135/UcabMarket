@@ -99,6 +99,25 @@ Dado que el frontend es HTML/CSS/JavaScript nativo con Bootstrap vía CDN:
 
 ---
 
+## 🧩 Arquitectura: Modelo, Vista y Controlador
+
+UcabMarket es un monolito modular con NestJS. Cada módulo del backend (`users`, `products`, `chats`, `questions`, `reviews`) sigue la misma separación:
+
+| Parte | Responsabilidad | Dónde está |
+| :--- | :--- | :--- |
+| **Modelo** | Datos y reglas de negocio | `*.entity.ts`, `*.service.ts` y `persistence/json-database.service.ts` |
+| **Vista** | Lo que ve el usuario | `frontend/public/*.html` y `frontend/public/assets/js/` |
+| **Controlador** | Recibe la petición y llama al modelo | `*.controller.ts` y `chats/chats.gateway.ts` para tiempo real |
+
+**Recorrido de una petición:** la Vista llama al servidor con `api.js`, `AuthGuard` revisa el token, el Controlador recibe la petición, el Service aplica las reglas y `JsonDatabaseService` lee o guarda los datos.
+
+**Reglas para mantenerlo ordenado:**
+- Los controladores no contienen reglas de negocio; las delegan en su service.
+- Los services no leen ni escriben archivos directamente; usan `JsonDatabaseService`.
+- La Vista no llama a `fetch` directamente; usa `api.js`.
+
+---
+
 ## 📁 Estructura del Repositorio
 
 ```text
