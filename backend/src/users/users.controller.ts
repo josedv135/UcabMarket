@@ -6,13 +6,13 @@ import {
   Body,
   Param,
   UseGuards,
-  Request,
   ForbiddenException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { UsuarioActual, UsuarioSesion } from '../auth/decorators/usuario-actual.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -25,13 +25,13 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get('me')
-  async getMyProfile(@Request() req: any) {
-    return this.usersService.buscarPorId(req.user.id);
+  async getMyProfile(@UsuarioActual() usuario: UsuarioSesion) {
+    return this.usersService.buscarPorId(usuario.id);
   }
 
   @Get(':id')
   async getProfile(@Param('id') id: string) {
-    return this.usersService.buscarPorId(id);
+    return this.usersService.perfilPublico(id);
   }
 
   @UseGuards(AuthGuard)
@@ -39,9 +39,9 @@ export class UsersController {
   async updateProfile(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Request() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
-    if (req.user.id !== id) {
+    if (usuario.id !== id) {
       throw new ForbiddenException(
         'Solo puedes modificar los datos de tu propio perfil',
       );
@@ -49,8 +49,4 @@ export class UsersController {
     return this.usersService.actualizar(id, updateUserDto);
   }
 
-  @Get()
-  async getAll() {
-    return this.usersService.listarTodos();
-  }
 }

@@ -9,7 +9,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
-import { usuarioId } from './usuario-id';
 import { Message } from './message.entity';
 
 @WebSocketGateway({
@@ -30,7 +29,7 @@ export class ChatsGateway implements OnGatewayConnection {
   handleConnection(client: Socket) {
     try {
       const payload = this.jwtService.verify(client.handshake.auth?.token);
-      client.data.userId = usuarioId(payload);
+      client.data.userId = payload.id;
     } catch {
       client.emit('chatError', { message: 'Debes iniciar sesión para usar el chat' });
       client.disconnect();

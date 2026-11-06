@@ -5,18 +5,17 @@ import {
   Get,
   Param,
   Post,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { UsuarioActual, UsuarioSesion } from '../auth/decorators/usuario-actual.decorator';
 import { ChatsService } from './chats.service';
 import { ChatsGateway } from './chats.gateway';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { descartarArchivo, multerChatConfig, nombreOriginal } from './chats.multer';
-import { usuarioId } from './usuario-id';
 
 // Regla 1: solo miembros con sesión iniciada
 @UseGuards(AuthGuard)
@@ -28,8 +27,8 @@ export class ChatsController {
   ) {}
 
   @Post()
-  crear(@Body() dto: CreateChatDto, @Req() req: any) {
-    return this.chatsService.crearChat(dto.productId, usuarioId(req.user));
+  crear(@Body() dto: CreateChatDto, @UsuarioActual() usuario: UsuarioSesion) {
+    return this.chatsService.crearChat(dto.productId, usuario.id);
   }
 
   /** HU Añadir archivos: sube el archivo y lo muestra en la conversación */
@@ -38,7 +37,7 @@ export class ChatsController {
   async adjuntar(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
     if (!file) {
       throw new BadRequestException('Selecciona un archivo para enviarlo');
@@ -46,7 +45,7 @@ export class ChatsController {
     try {
       const mensaje = await this.chatsService.guardarArchivo(
         id,
-        usuarioId(req.user),
+        usuario.id,
         file.filename,
         nombreOriginal(file),
       );
@@ -59,12 +58,12 @@ export class ChatsController {
   }
 
   @Get(':id')
-  obtener(@Param('id') id: string, @Req() req: any) {
-    return this.chatsService.obtenerChat(id, usuarioId(req.user));
+  obtener(@Param('id') id: string, @UsuarioActual() usuario: UsuarioSesion) {
+    return this.chatsService.obtenerChat(id, usuario.id);
   }
 
   @Get(':id/messages')
-  mensajes(@Param('id') id: string, @Req() req: any) {
-    return this.chatsService.listarMensajes(id, usuarioId(req.user));
+  mensajes(@Param('id') id: string, @UsuarioActual() usuario: UsuarioSesion) {
+    return this.chatsService.listarMensajes(id, usuario.id);
   }
 }

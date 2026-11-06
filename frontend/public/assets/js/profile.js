@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function cargarDatosPerfil(userId, esPropio) {
   try {
-    const data = await api.get(`/users/${userId}`);
+    const data = await api.get(esPropio ? '/users/me' : `/users/${encodeURIComponent(userId)}`);
     if (!data) throw new Error('Usuario no encontrado');
 
     const perfilNombre = document.getElementById('perfilNombre');
@@ -60,10 +60,14 @@ async function cargarDatosPerfil(userId, esPropio) {
     const avatarContainer = document.getElementById('perfilAvatarContainer');
 
     if (perfilNombre) perfilNombre.textContent = data.nombreCompleto;
-    if (perfilEmail) perfilEmail.textContent = data.email;
+    if (perfilEmail) {
+      perfilEmail.textContent = data.email || '';
+      perfilEmail.hidden = !esPropio;
+    }
     if (perfilCarrera) perfilCarrera.textContent = data.carrera || 'Estudiante UCAB';
 
     if (perfilTelefono) {
+      perfilTelefono.hidden = !esPropio;
       if (data.telefono && data.telefono.trim().length > 0) {
         perfilTelefono.innerHTML = `<i class="bi bi-telephone-fill text-primary me-1"></i> <span>${escapeHtml(data.telefono)}</span>`;
       } else {

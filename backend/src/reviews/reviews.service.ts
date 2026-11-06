@@ -37,7 +37,7 @@ export class ReviewsService {
     }
 
     const nuevaResena: Review = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      id: '',
       authorId,
       autorNombre: autorNombre || 'Compañero UCAB',
       targetUserId: dto.targetUserId,

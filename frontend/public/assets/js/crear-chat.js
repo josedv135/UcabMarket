@@ -50,7 +50,7 @@ const crearChat = {
   mostrarConfirmacion() {
     this.pintar(
       '¿Deseas crear un chat con el vendedor?',
-      `<p class="mb-0">Podrás coordinar la compra de <strong>${escapeHtmlChat(this.producto.titulo)}</strong> por mensajes privados.</p>`,
+      `<p class="mb-0">Podrás coordinar la compra de <strong>${escapeHtml(this.producto.titulo)}</strong> por mensajes privados.</p>`,
       [
         { texto: 'Salir', clase: 'btn-outline-secondary', accion: () => this.salir() },
         { texto: 'Crear chat', clase: 'btn-primary', accion: () => this.crear() },
@@ -72,7 +72,7 @@ const crearChat = {
       // 4.1 / 4.2: No se pudo crear el chat
       this.pintar(
         'No se pudo crear el chat, inténtalo de nuevo',
-        `<p class="mb-0 text-muted">${escapeHtmlChat(err.message)}</p>`,
+        `<p class="mb-0 text-muted">${escapeHtml(err.message)}</p>`,
         // 4.3 Confirma la lectura → 4.4 Regresa al paso 2
         [{ texto: 'OK', clase: 'btn-primary', accion: () => this.mostrarConfirmacion() }],
       );
@@ -84,8 +84,3 @@ const crearChat = {
     this.modal.hide();
   },
 };
-
-function escapeHtmlChat(texto) {
-  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-  return String(texto ?? '').replace(/[&<>"']/g, (m) => map[m]);
-}

@@ -6,12 +6,12 @@ import {
   Param,
   Body,
   UseGuards,
-  Request,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { UsuarioActual, UsuarioSesion } from '../auth/decorators/usuario-actual.decorator';
 
 @Controller('questions')
 export class QuestionsController {
@@ -26,11 +26,11 @@ export class QuestionsController {
   @Post()
   async createQuestion(
     @Body() createQuestionDto: CreateQuestionDto,
-    @Request() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
     return this.questionsService.crear(
-      req.user.id,
-      req.user.nombreCompleto,
+      usuario.id,
+      usuario.nombreCompleto,
       createQuestionDto,
     );
   }
@@ -40,8 +40,8 @@ export class QuestionsController {
   async answerQuestion(
     @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
-    @Request() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
-    return this.questionsService.responder(id, req.user.id, updateQuestionDto);
+    return this.questionsService.responder(id, usuario.id, updateQuestionDto);
   }
 }

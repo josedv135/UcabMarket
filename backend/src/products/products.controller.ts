@@ -8,7 +8,6 @@ import {
   Query,
   Body,
   UseGuards,
-  Request,
   UseInterceptors,
   UploadedFiles,
   BadRequestException,
@@ -19,6 +18,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { UsuarioActual, UsuarioSesion } from '../auth/decorators/usuario-actual.decorator';
 import {
   multerProductConfig,
   descartarFotos,
@@ -42,8 +42,10 @@ export class ProductsController {
   async getCatalog(
     @Query('q') q?: string,
     @Query('categoria') categoria?: string,
+    @Query('pagina') pagina?: string,
+    @Query('limite') limite?: string,
   ) {
-    return this.productsService.listar(q, categoria);
+    return this.productsService.listar(q, categoria, Number(pagina), Number(limite));
   }
 
   @Get('user/:userId')
@@ -67,8 +69,8 @@ export class ProductsController {
    */
   @UseGuards(AuthGuard)
   @Post('validar')
-  async validarNuevoProducto(@Body() dto: CreateProductDto, @Request() req: any) {
-    await this.productsService.verificarNuevo(req.user.id, dto);
+  async validarNuevoProducto(@Body() dto: CreateProductDto, @UsuarioActual() usuario: UsuarioSesion) {
+    await this.productsService.verificarNuevo(usuario.id, dto);
     return { valido: true };
   }
 
@@ -81,7 +83,7 @@ export class ProductsController {
   async createProduct(
     @Body() body: any,
     @UploadedFiles() files: Express.Multer.File[] = [],
-    @Request() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
     try {
       // Regla de negocio 2 / CA3
@@ -98,7 +100,7 @@ export class ProductsController {
       });
 
       const fotos = files.map((f) => f.filename);
-      return await this.productsService.crear(req.user.id, dto, fotos);
+      return await this.productsService.crear(usuario.id, dto, fotos);
     } catch (err) {
       descartarFotos(files);
       throw err;
@@ -112,15 +114,15 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() files: Express.Multer.File[],
-    @Request() req: any,
+    @UsuarioActual() usuario: UsuarioSesion,
   ) {
     const fotos = files && files.length > 0 ? files.map((f) => f.filename) : undefined;
-    return this.productsService.actualizar(id, req.user.id, updateProductDto, fotos);
+    return this.productsService.actualizar(id, usuario.id, updateProductDto, fotos);
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
-  async deleteProduct(@Param('id') id: string, @Request() req: any) {
-    return this.productsService.eliminar(id, req.user.id);
+  async deleteProduct(@Param('id') id: string, @UsuarioActual() usuario: UsuarioSesion) {
+    return this.productsService.eliminar(id, usuario.id);
   }
 }
