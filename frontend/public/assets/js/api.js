@@ -2,6 +2,13 @@
  * Módulo reutilizable de llamadas a la API de UcabMarket
  * Utiliza CONFIG.API_BASE_URL e inyecta el token Bearer automáticamente.
  */
+function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return String(text).replace(/[&<>"']/g, (m) => map[m]);
+}
+window.escapeHtml = escapeHtml;
+
 const api = {
   getToken() {
     return localStorage.getItem(CONFIG.TOKEN_KEY);
@@ -9,12 +16,27 @@ const api = {
 
   getCurrentUser() {
     const raw = localStorage.getItem(CONFIG.USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    try {
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
   },
 
   setSession(token, user) {
-    localStorage.setItem(CONFIG.TOKEN_KEY, token);
-    localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(user));
+    if (token) {
+      localStorage.setItem(CONFIG.TOKEN_KEY, token);
+    }
+    if (user) {
+      localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(user));
+    }
+  },
+
+  updateUser(updatedFields) {
+    const current = this.getCurrentUser() || {};
+    const merged = { ...current, ...updatedFields };
+    localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(merged));
+    return merged;
   },
 
   clearSession() {
@@ -46,8 +68,17 @@ const api = {
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      const errorMsg = data?.message || (Array.isArray(data?.message) ? data.message.join(', ') : 'Error en la petición');
-      throw new Error(errorMsg);
+      let errorMsg = 'Error en la petición';
+      if (Array.isArray(data?.message)) {
+        errorMsg = data.message.join('. ');
+      } else if (typeof data?.message === 'string') {
+        errorMsg = data.message;
+      } else if (data?.error) {
+        errorMsg = data.error;
+      }
+      const error = new Error(errorMsg);
+      error.status = response.status;
+      throw error;
     }
 
     return data;

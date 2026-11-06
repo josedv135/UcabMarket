@@ -34,10 +34,9 @@ El equipo adopta una estrategia de ramificación basada en GitFlow adaptada a la
 | :--- | :--- | :--- |
 | `feature/usuario-crear-cuenta` | Crear cuenta | Paola |
 | `feature/usuario-consultar-perfil` | Consultar perfil | Paola |
-| `feature/productos-anadir-publicacion` | Añadir publicación | Eliavalentina |
-| `feature/productos-consultar-publicacion` | Consultar publicación | Eliavalentina |
-| `feature/catalogo-visualizar` | Visualizar catálogo de productos | Victoria |
-| `feature/catalogo-busqueda` | Búsqueda de productos | Victoria |
+| `feature/productos-anadir-publicacion` | Añadir producto | Victoria |
+| `feature/productos-consultar-publicacion` | Consultar producto | Victoria |
+| `feature/gestion-preguntas` | Gestión de preguntas | Eliavalentina |
 | `feature/chats-crear-chat` | Crear chat | José |
 | `feature/chats-anadir-archivos` | Añadir archivos | José |
 | `feature/resenas-anadir` | Añadir reseña | Gabriel |

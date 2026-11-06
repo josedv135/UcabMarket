@@ -5,69 +5,63 @@ import {
   MessageBody,
   ConnectedSocket,
   OnGatewayConnection,
-  OnGatewayDisconnect,
 } from '@nestjs/websockets';
+import { JwtService } from '@nestjs/jwt';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from './chats.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { usuarioId } from './chats.controller';
 
 @WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatsGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatsService: ChatsService) {}
+  constructor(
+    private readonly chatsService: ChatsService,
+    private readonly jwtService: JwtService,
+  ) {}
 
+  /** Regla 1: sin token válido no hay conexión al chat */
   handleConnection(client: Socket) {
-    console.log(`[Socket.IO] Cliente conectado: ${client.id}`);
+    try {
+      const payload = this.jwtService.verify(client.handshake.auth?.token);
+      client.data.userId = usuarioId(payload);
+    } catch {
+      client.emit('chatError', { message: 'Debes iniciar sesión para usar el chat' });
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(`[Socket.IO] Cliente desconectado: ${client.id}`);
-  }
-
-  /**
-   * Unirse a una sala privada de chat previa verificación de membresía (ISO 25010)
-   */
+  /** Unirse a la sala privada del chat previa verificación de membresía (ISO 25010) */
   @SubscribeMessage('joinChat')
   async handleJoinChat(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { chatId: string; userId: string },
+    @MessageBody() payload: { chatId: string },
   ) {
-    const { chatId, userId } = payload;
-    const esMiembro = await this.chatsService.verificarMembresia(chatId, userId);
+    const esMiembro = await this.chatsService.verificarMembresia(payload?.chatId, client.data.userId);
     if (!esMiembro) {
-      client.emit('error', { message: 'Acceso denegado: No perteneces a esta conversación' });
+      client.emit('chatError', { message: 'No perteneces a esta conversación' });
       return;
     }
-    client.join(`chat_${chatId}`);
-    client.emit('joinedChat', { chatId, message: 'Conectado a la sala exitosamente' });
+    client.join(`chat_${payload.chatId}`);
   }
 
-  /**
-   * Envío de mensaje en tiempo real sin recargar la página
-   */
+  /** Paso 9-10: envía el mensaje y lo muestra a los dos miembros sin recargar */
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: CreateMessageDto,
+    @MessageBody() data: { chatId: string; texto: string },
   ) {
-    // Verificación de Integridad y Confidencialidad (ISO 25010)
-    const esMiembro = await this.chatsService.verificarMembresia(data.chatId, data.authorId);
-    if (!esMiembro) {
-      client.emit('error', { message: 'Seguridad ISO 25010: Solo los dos miembros pueden escribir en este chat' });
-      return;
+    // CA6: el autor es siempre quien tiene la sesión, no lo que diga el cliente
+    try {
+      const mensaje = await this.chatsService.guardarMensaje(data?.chatId, client.data.userId, data?.texto);
+      this.server.to(`chat_${data.chatId}`).emit('newMessage', mensaje);
+    } catch (err) {
+      client.emit('chatError', { message: err.message });
     }
-
-    // Persistir mensaje en messages.json
-    const nuevoMensaje = await this.chatsService.guardarMensaje(data);
-
-    // Emitir a los integrantes de la sala
-    this.server.to(`chat_${data.chatId}`).emit('newMessage', nuevoMensaje);
   }
 }
