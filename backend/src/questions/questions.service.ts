@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  ConflictException,
 } from '@nestjs/common';
 import { JsonDatabaseService } from '../persistence/json-database.service';
 import { ProductsService } from '../products/products.service';
@@ -35,7 +36,14 @@ export class QuestionsService {
     dto: CreateQuestionDto,
   ): Promise<Question> {
     // Validar que el producto existe
-    await this.productsService.buscarPorId(dto.productId);
+    const producto = await this.productsService.buscarPorId(dto.productId);
+
+    // El vendedor no puede preguntar en su propia publicación
+    if (producto.userId === userId) {
+      throw new ForbiddenException(
+        'No puedes hacer preguntas en tu propia publicación',
+      );
+    }
 
     const nuevaPregunta: Question = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
@@ -68,6 +76,11 @@ export class QuestionsService {
       throw new ForbiddenException(
         'Solo el vendedor de este producto puede responder la pregunta',
       );
+    }
+
+    // Cada pregunta se responde una sola vez
+    if (pregunta.respuesta) {
+      throw new ConflictException('Esta pregunta ya fue respondida');
     }
 
     return this.db.actualizar<Question>(this.coleccion, questionId, {
