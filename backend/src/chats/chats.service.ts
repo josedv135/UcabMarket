@@ -7,8 +7,8 @@ import {
 import { JsonDatabaseService } from '../persistence/json-database.service';
 import { Chat } from './chat.entity';
 import { Message } from './message.entity';
-import { Product } from '../products/product.entity';
-import { User } from '../users/user.entity';
+import { ProductsService } from '../products/products.service';
+import { UsersService } from '../users/users.service';
 
 const MAX_TEXTO = 1000;
 
@@ -23,11 +23,15 @@ export interface ChatVista {
 
 @Injectable()
 export class ChatsService {
-  constructor(private readonly db: JsonDatabaseService) {}
+  constructor(
+    private readonly db: JsonDatabaseService,
+    private readonly productsService: ProductsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   /** Paso 4: crea el chat entre el miembro y el vendedor del producto */
   async crearChat(productId: string, compradorId: string): Promise<ChatVista> {
-    const producto = await this.db.buscarPorId<Product>('products', productId);
+    const producto = await this.siExiste(this.productsService.buscarPorId(productId));
     if (!producto) {
       throw new NotFoundException('No se pudo crear el chat: el producto no existe');
     }
@@ -129,11 +133,23 @@ export class ChatsService {
     return chat;
   }
 
+  /** Productos y Usuarios avisan con NotFoundException; aquí se trata como «no existe» */
+  private async siExiste<T>(consulta: Promise<T>): Promise<T | null> {
+    try {
+      return await consulta;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
   private async armarVista(chat: Chat): Promise<ChatVista> {
     const [producto, comprador, vendedor] = await Promise.all([
-      this.db.buscarPorId<Product>('products', chat.productId),
-      this.db.buscarPorId<User>('users', chat.compradorId),
-      this.db.buscarPorId<User>('users', chat.vendedorId),
+      this.siExiste(this.productsService.buscarPorId(chat.productId)),
+      this.siExiste(this.usersService.perfilPublico(chat.compradorId)),
+      this.siExiste(this.usersService.perfilPublico(chat.vendedorId)),
     ]);
     return {
       id: chat.id,
