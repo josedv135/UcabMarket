@@ -43,9 +43,10 @@ export class UsersService {
 
   async registrar(dto: CreateUserDto): Promise<Omit<User, 'password'>> {
     const emailNormalizado = dto.email.toLowerCase().trim();
-    if (!emailNormalizado.endsWith('@ucab.edu.ve')) {
+    const esDominioUcab = emailNormalizado.endsWith('@ucab.edu.ve') || emailNormalizado.endsWith('.ucab.edu.ve');
+    if (!esDominioUcab) {
       throw new BadRequestException(
-        'Solo se permiten correos institucionales con dominio @ucab.edu.ve',
+        'Solo se permiten correos institucionales de la UCAB (@ucab.edu.ve o @est.ucab.edu.ve)',
       );
     }
 

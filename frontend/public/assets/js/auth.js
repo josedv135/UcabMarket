@@ -58,8 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = emailInput.value.trim().toLowerCase();
       const password = passwordInput.value;
 
-      if (!email.endsWith('@ucab.edu.ve')) {
-        mostrarAlerta('Solo se permite el acceso con correos institucionales <strong>@ucab.edu.ve</strong>', 'warning');
+      const esDominioUcab = email.endsWith('@ucab.edu.ve') || email.endsWith('.ucab.edu.ve');
+      if (!esDominioUcab) {
+        mostrarAlerta('Solo se permite el acceso con correos institucionales de la UCAB (<strong>@ucab.edu.ve</strong> o <strong>@est.ucab.edu.ve</strong>)', 'warning');
         return;
       }
 
@@ -108,8 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (!email.endsWith('@ucab.edu.ve')) {
-        mostrarAlerta('Registro restringido: El correo debe pertenecer al dominio <strong>@ucab.edu.ve</strong>', 'warning');
+      const esDominioUcab = email.endsWith('@ucab.edu.ve') || email.endsWith('.ucab.edu.ve');
+      if (!esDominioUcab) {
+        mostrarAlerta('Registro restringido: El correo debe pertenecer al dominio institucional de la UCAB (<strong>@ucab.edu.ve</strong> o <strong>@est.ucab.edu.ve</strong>)', 'warning');
         return;
       }
 

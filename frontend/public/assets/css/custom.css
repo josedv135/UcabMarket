@@ -1,33 +1,162 @@
 /* UcabMarket - Estilos Personalizados (Web de Escritorio) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --ucab-blue: #003366;
-  --ucab-gold: #f2a900;
-  --ucab-light: #f8fafc;
+  /* Colores oficiales UCAB */
+  --ucab-yellow: #fdc531;
+  --ucab-blue: #38b3e7;
+  --ucab-blue-dark: #1b85b4;
+  --ucab-blue-deeper: #0f587a;
+  --ucab-green: #02783a;
+  --ucab-green-dark: #015c2c;
+
+  /* Aliases y entorno */
+  --ucab-gold: #fdc531;
+  --ucab-light: #f4f8fa;
   --ucab-card-border: #e2e8f0;
+
+  /* Variables Bootstrap */
+  --bs-primary: #38b3e7;
+  --bs-primary-rgb: 56, 179, 231;
+  --bs-success: #02783a;
+  --bs-success-rgb: 2, 120, 58;
+  --bs-warning: #fdc531;
+  --bs-warning-rgb: 253, 197, 49;
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   background-color: var(--ucab-light);
   color: #1e293b;
   min-width: 1024px; /* Optimizado exclusivamente para web de escritorio */
 }
 
-.navbar-ucab {
-  background-color: var(--ucab-blue);
+/* Tipografía en botones y títulos */
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.02em;
 }
 
+/* Barra de Navegación con Azul UCAB (#38b3e7) */
+.navbar-ucab {
+  background: linear-gradient(135deg, #1b85b4 0%, #0f587a 100%) !important;
+  box-shadow: 0 2px 10px rgba(15, 88, 122, 0.25);
+}
+
+.navbar-ucab .navbar-brand {
+  color: #ffffff !important;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.navbar-ucab .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.navbar-ucab .nav-link:hover,
+.navbar-ucab .nav-link.active {
+  color: var(--ucab-yellow) !important;
+}
+
+/* Botones con estilo UCAB */
 .btn-ucab {
-  background-color: var(--ucab-blue);
+  background-color: #1b85b4;
   color: #ffffff;
   border: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn-ucab:hover {
-  background-color: #002244;
+  background-color: #0f587a;
   color: #ffffff;
 }
 
+.btn-primary {
+  background-color: #38b3e7 !important;
+  border-color: #38b3e7 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: #1b85b4 !important;
+  border-color: #1b85b4 !important;
+  color: #ffffff !important;
+}
+
+.btn-success {
+  background-color: #02783a !important;
+  border-color: #02783a !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.btn-success:hover,
+.btn-success:focus,
+.btn-success:active {
+  background-color: #015c2c !important;
+  border-color: #015c2c !important;
+}
+
+.btn-warning {
+  background-color: var(--ucab-yellow) !important;
+  border-color: var(--ucab-yellow) !important;
+  color: #1e293b !important;
+  font-weight: 700;
+}
+
+.btn-warning:hover {
+  background-color: #e5b026 !important;
+  border-color: #e5b026 !important;
+  color: #0f172a !important;
+}
+
+.btn-outline-primary {
+  color: #1b85b4 !important;
+  border-color: #38b3e7 !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: #38b3e7 !important;
+  border-color: #38b3e7 !important;
+  color: #ffffff !important;
+}
+
+/* Píldoras de navegación / Tabs */
+.nav-pills .nav-link.active {
+  background-color: #1b85b4 !important;
+  color: #ffffff !important;
+}
+
+.nav-pills .nav-link {
+  color: #475569;
+}
+
+.nav-tabs .nav-link.active {
+  color: #1b85b4 !important;
+  border-bottom: 2px solid #1b85b4 !important;
+}
+
+/* Badges y acentos */
+.text-primary {
+  color: #1b85b4 !important;
+}
+
+.bg-primary {
+  background-color: #38b3e7 !important;
+}
+
+.border-primary {
+  border-color: #38b3e7 !important;
+}
+
+/* Tarjetas y productos */
 .card-product {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   border: 1px solid var(--ucab-card-border);
@@ -45,7 +174,7 @@ body {
   border-radius: 8px;
 }
 
-/* Logo de UcabMarket: el carrito va en un recuadro blanco para que se lea sobre la barra azul */
+/* Logo de UcabMarket */
 .navbar-logo {
   display: flex;
   align-items: center;
@@ -57,6 +186,7 @@ body {
   border-radius: 8px;
   padding: 3px 6px;
   line-height: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .navbar-logo-icono img {
@@ -64,7 +194,7 @@ body {
   width: auto;
 }
 
-/* Movimiento del carrito: entra rodando, da un saltito cada pocos segundos y acelera al pasar el mouse */
+/* Movimiento del carrito */
 @keyframes carrito-entra {
   0%   { transform: translateX(-140px) rotate(0); opacity: 0; }
   60%  { transform: translateX(10px) rotate(-6deg); opacity: 1; }
@@ -92,7 +222,6 @@ body {
   85% { transform: scaleX(0.7); opacity: 0.12; }
 }
 
-/* Inicio de sesión: entra y luego salta cada 4 s, con una sombra que acompaña el salto */
 .logo-carrito-entrada {
   display: block;
   margin-left: auto;
@@ -125,7 +254,6 @@ body {
   animation: carrito-acelera 0.5s ease-in-out infinite;
 }
 
-/* Barra: entra rodando al cargar y acelera al pasar el mouse */
 .navbar-logo-icono img {
   transform-origin: bottom center;
   animation: carrito-entra 0.8s cubic-bezier(.2,.8,.3,1.2) both;
@@ -145,7 +273,7 @@ body {
   }
 }
 
-/* Consultar Producto: flechas de la galería visibles sobre fondo claro */
+/* Consultar Producto */
 #galeriaFotos .carousel-control-prev-icon,
 #galeriaFotos .carousel-control-next-icon {
   filter: invert(1) grayscale(1);

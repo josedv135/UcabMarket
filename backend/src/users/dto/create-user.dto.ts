@@ -7,8 +7,8 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'El correo institucional es obligatorio' })
   @IsEmail({}, { message: 'El correo electrónico no es válido' })
-  @Matches(/^[a-zA-Z0-9._%+-]+@ucab\.edu\.ve$/i, {
-    message: 'Registro restringido: El correo debe pertenecer al dominio institucional @ucab.edu.ve',
+  @Matches(/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9.-]+\.)?ucab\.edu\.ve$/i, {
+    message: 'Registro restringido: El correo debe pertenecer al dominio institucional de la UCAB (@ucab.edu.ve o @est.ucab.edu.ve)',
   })
   email: string;
 

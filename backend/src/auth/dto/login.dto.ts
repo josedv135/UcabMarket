@@ -2,8 +2,8 @@ import { IsEmail, IsNotEmpty, Matches, MinLength } from 'class-validator';
 
 export class LoginDto {
   @IsEmail({}, { message: 'El formato del correo institucional es inválido' })
-  @Matches(/^[a-zA-Z0-9._%+-]+@ucab\.edu\.ve$/, {
-    message: 'Solo se permiten correos institucionales con dominio @ucab.edu.ve',
+  @Matches(/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9.-]+\.)?ucab\.edu\.ve$/i, {
+    message: 'Solo se permiten correos institucionales de la UCAB (@ucab.edu.ve o @est.ucab.edu.ve)',
   })
   email: string;
 
