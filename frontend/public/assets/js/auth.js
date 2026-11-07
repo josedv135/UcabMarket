@@ -108,6 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarAlerta('Por favor, ingresa tu nombre completo', 'warning');
         return;
       }
+      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreCompleto)) {
+        mostrarAlerta('El nombre completo no debe contener números ni caracteres especiales', 'warning');
+        return;
+      }
 
       const esDominioUcab = email.endsWith('@ucab.edu.ve') || email.endsWith('.ucab.edu.ve');
       if (!esDominioUcab) {
@@ -116,12 +120,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!carrera) {
-        mostrarAlerta('Por favor, indica tu carrera o facultad UCAB', 'warning');
+        mostrarAlerta('Por favor, indica tu carrera', 'warning');
+        return;
+      }
+      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(carrera)) {
+        mostrarAlerta('La carrera no debe contener números ni caracteres especiales', 'warning');
+        return;
+      }
+
+      if (telefono && !/^\d{11}$/.test(telefono)) {
+        mostrarAlerta('El número telefónico debe tener exactamente 11 dígitos numéricos (ej. 04141234567)', 'warning');
         return;
       }
 
       if (password.length < 6) {
         mostrarAlerta('La contraseña debe tener un mínimo de 6 caracteres', 'warning');
+        return;
+      }
+
+      if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+        mostrarAlerta('La contraseña debe incluir tanto letras como números', 'warning');
         return;
       }
 

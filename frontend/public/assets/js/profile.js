@@ -208,13 +208,31 @@ async function actualizarPerfil(e, currentUser) {
     mostrarAlertaModal('El nombre completo es obligatorio', 'warning');
     return;
   }
-  if (!carrera) {
-    mostrarAlertaModal('La carrera o escuela es obligatoria', 'warning');
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreCompleto)) {
+    mostrarAlertaModal('El nombre completo no debe contener números ni caracteres especiales', 'warning');
     return;
   }
-  if (password && password.length < 6) {
-    mostrarAlertaModal('La contraseña debe tener al menos 6 caracteres', 'warning');
+  if (!carrera) {
+    mostrarAlertaModal('La carrera es obligatoria', 'warning');
     return;
+  }
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(carrera)) {
+    mostrarAlertaModal('La carrera no debe contener números ni caracteres especiales', 'warning');
+    return;
+  }
+  if (telefono && !/^\d{11}$/.test(telefono)) {
+    mostrarAlertaModal('El teléfono debe tener exactamente 11 dígitos numéricos (ej. 04141234567)', 'warning');
+    return;
+  }
+  if (password) {
+    if (password.length < 6) {
+      mostrarAlertaModal('La contraseña debe tener al menos 6 caracteres', 'warning');
+      return;
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+      mostrarAlertaModal('La contraseña debe incluir tanto letras como números', 'warning');
+      return;
+    }
   }
 
   try {
