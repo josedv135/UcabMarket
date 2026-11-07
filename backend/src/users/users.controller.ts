@@ -6,13 +6,17 @@ import {
   Body,
   Param,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
   ForbiddenException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { UsuarioActual, UsuarioSesion } from '../auth/decorators/usuario-actual.decorator';
+import { multerAvatarConfig } from './users.multer';
 
 @Controller('users')
 export class UsersController {
@@ -49,4 +53,20 @@ export class UsersController {
     return this.usersService.actualizar(id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard)
+  @Post(':id/avatar')
+  @UseInterceptors(FileInterceptor('avatar', multerAvatarConfig))
+  async subirAvatar(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @UsuarioActual() usuario: UsuarioSesion,
+  ) {
+    if (usuario.id !== id) {
+      throw new ForbiddenException(
+        'Solo puedes subir foto a tu propio perfil',
+      );
+    }
+    const avatarUrl = file ? `/uploads/avatars/${file.filename}` : '';
+    return this.usersService.actualizar(id, { fotoPerfil: avatarUrl });
+  }
 }

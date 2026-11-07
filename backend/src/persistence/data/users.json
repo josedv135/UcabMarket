@@ -6,5 +6,23 @@
     "password": "$2b$10$d9D9yPWDOsgfOQOpqXozl.chOjf7wBmVeBBzIZwDNl6tqXtP7hRRG",
     "carrera": "ingenieria en informatica",
     "fechaRegistro": "2026-11-04T03:50:31.730Z"
+  },
+  {
+    "id": "1793997452844-muyxexc",
+    "nombreCompleto": "Paola De La Cruz",
+    "email": "pvdelacruz.25@ucab.edu.ve",
+    "password": "$2b$10$8OstudWsNRptykUVVCQHD.DGoG6CbpwXb99OCi9LMZTFaYNFWkkBq",
+    "carrera": "Ingenieria Informatica",
+    "telefono": "4142289344",
+    "fechaRegistro": "2026-11-06T20:37:32.838Z"
+  },
+  {
+    "id": "1794000616813-lf0p3ff",
+    "nombreCompleto": "Paola De La Cruz",
+    "email": "pvdelacruz.25@est.ucab.edu.ve",
+    "password": "$2b$10$MdpICUgVYjf5ctZNI9NKnOyq8iSbhtxOuORBaAEeblWuPHCzQuHAO",
+    "carrera": "Ingenieria Informatica",
+    "telefono": "4142289344",
+    "fechaRegistro": "2026-11-06T21:30:16.807Z"
   }
 ]

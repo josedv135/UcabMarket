@@ -58,8 +58,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = emailInput.value.trim().toLowerCase();
       const password = passwordInput.value;
 
-      if (!email.endsWith('@ucab.edu.ve')) {
-        mostrarAlerta('Solo se permite el acceso con correos institucionales <strong>@ucab.edu.ve</strong>', 'warning');
+      const esDominioUcab = email.endsWith('@ucab.edu.ve') || email.endsWith('.ucab.edu.ve');
+      if (!esDominioUcab) {
+        mostrarAlerta('Solo se permite el acceso con correos institucionales de la UCAB (<strong>@ucab.edu.ve</strong> o <strong>@est.ucab.edu.ve</strong>)', 'warning');
         return;
       }
 
@@ -107,19 +108,38 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarAlerta('Por favor, ingresa tu nombre completo', 'warning');
         return;
       }
+      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreCompleto)) {
+        mostrarAlerta('El nombre completo no debe contener números ni caracteres especiales', 'warning');
+        return;
+      }
 
-      if (!email.endsWith('@ucab.edu.ve')) {
-        mostrarAlerta('Registro restringido: El correo debe pertenecer al dominio <strong>@ucab.edu.ve</strong>', 'warning');
+      const esDominioUcab = email.endsWith('@ucab.edu.ve') || email.endsWith('.ucab.edu.ve');
+      if (!esDominioUcab) {
+        mostrarAlerta('Registro restringido: El correo debe pertenecer al dominio institucional de la UCAB (<strong>@ucab.edu.ve</strong> o <strong>@est.ucab.edu.ve</strong>)', 'warning');
         return;
       }
 
       if (!carrera) {
-        mostrarAlerta('Por favor, indica tu carrera o facultad UCAB', 'warning');
+        mostrarAlerta('Por favor, indica tu carrera', 'warning');
+        return;
+      }
+      if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(carrera)) {
+        mostrarAlerta('La carrera no debe contener números ni caracteres especiales', 'warning');
+        return;
+      }
+
+      if (telefono && !/^\d{11}$/.test(telefono)) {
+        mostrarAlerta('El número telefónico debe tener exactamente 11 dígitos numéricos (ej. 04141234567)', 'warning');
         return;
       }
 
       if (password.length < 6) {
         mostrarAlerta('La contraseña debe tener un mínimo de 6 caracteres', 'warning');
+        return;
+      }
+
+      if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+        mostrarAlerta('La contraseña debe incluir tanto letras como números', 'warning');
         return;
       }
 

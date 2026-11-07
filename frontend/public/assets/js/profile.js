@@ -9,6 +9,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Configurar botón de cerrar sesión con confirmación
+  const btnCerrarSesion = document.getElementById('btnCerrarSesion');
+  if (btnCerrarSesion) {
+    btnCerrarSesion.addEventListener('click', (e) => {
+      e.preventDefault();
+      const modalLogoutEl = document.getElementById('modalConfirmarCerrarSesion');
+      if (modalLogoutEl && typeof bootstrap !== 'undefined') {
+        const modalLogout = new bootstrap.Modal(modalLogoutEl);
+        modalLogout.show();
+      } else {
+        if (confirm('¿Seguro que quieres cerrar sesión?')) {
+          api.clearSession();
+          window.location.href = 'index.html';
+        }
+      }
+    });
+  }
+
+  const btnConfirmarLogout = document.getElementById('btnConfirmarLogout');
+  if (btnConfirmarLogout) {
+    btnConfirmarLogout.addEventListener('click', () => {
+      api.clearSession();
+      window.location.href = 'index.html';
+    });
+  }
+
   // Detectar si vemos el perfil propio o el de otro usuario vía ?userId=...
   const params = new URLSearchParams(window.location.search);
   const targetUserId = params.get('userId') || user.id;
@@ -17,30 +43,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   cargarDatosPerfil(targetUserId, esPropio);
   cargarProductosUsuario(targetUserId);
 
-  if (typeof reviews !== 'undefined' && reviews.cargarResenasUsuario) {
-    reviews.cargarResenasUsuario(targetUserId);
-  }
-
   const formEditar = document.getElementById('formEditarPerfil');
   if (formEditar && esPropio) {
     formEditar.addEventListener('submit', (e) => actualizarPerfil(e, user));
-  }
-
-  // Manejar envío de nueva reseña desde el modal (Sprint 1)
-  const formResena = document.getElementById('formNuevaResena');
-  if (formResena) {
-    formResena.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const puntuacion = document.getElementById('resenaPuntuacion').value;
-      const comentario = document.getElementById('resenaComentario').value;
-      if (typeof reviews !== 'undefined' && reviews.enviarResena) {
-        await reviews.enviarResena(targetUserId, puntuacion, comentario);
-      }
-      const modalEl = document.getElementById('modalNuevaResena');
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      if (modal) modal.hide();
-      formResena.reset();
-    });
   }
 });
 
@@ -49,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function cargarDatosPerfil(userId, esPropio) {
   try {
-    const data = await api.get(esPropio ? '/users/me' : `/users/${encodeURIComponent(userId)}`);
+    const data = await api.get(`/users/${userId}`);
     if (!data) throw new Error('Usuario no encontrado');
 
     const perfilNombre = document.getElementById('perfilNombre');
@@ -60,14 +65,10 @@ async function cargarDatosPerfil(userId, esPropio) {
     const avatarContainer = document.getElementById('perfilAvatarContainer');
 
     if (perfilNombre) perfilNombre.textContent = data.nombreCompleto;
-    if (perfilEmail) {
-      perfilEmail.textContent = data.email || '';
-      perfilEmail.hidden = !esPropio;
-    }
+    if (perfilEmail) perfilEmail.textContent = data.email || 'Correo protegido';
     if (perfilCarrera) perfilCarrera.textContent = data.carrera || 'Estudiante UCAB';
 
     if (perfilTelefono) {
-      perfilTelefono.hidden = !esPropio;
       if (data.telefono && data.telefono.trim().length > 0) {
         perfilTelefono.innerHTML = `<i class="bi bi-telephone-fill text-primary me-1"></i> <span>${escapeHtml(data.telefono)}</span>`;
       } else {
@@ -96,7 +97,10 @@ async function cargarDatosPerfil(userId, esPropio) {
     // Renderizar avatar (iniciales o foto de perfil)
     if (avatarContainer) {
       if (data.fotoPerfil && data.fotoPerfil.trim().length > 0) {
-        avatarContainer.innerHTML = `<img src="${escapeHtml(data.fotoPerfil)}" alt="${escapeHtml(data.nombreCompleto)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'bi bi-person-fill\\'></i>';">`;
+        const fotoUrl = data.fotoPerfil.startsWith('http') || data.fotoPerfil.startsWith('/')
+          ? data.fotoPerfil
+          : `/uploads/avatars/${data.fotoPerfil}`;
+        avatarContainer.innerHTML = `<img src="${escapeHtml(fotoUrl)}" alt="${escapeHtml(data.nombreCompleto)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'bi bi-person-fill\\'></i>';">`;
       } else {
         const partes = (data.nombreCompleto || '').trim().split(/\s+/);
         const iniciales = partes.slice(0, 2).map((p) => p[0]?.toUpperCase()).join('');
@@ -145,7 +149,7 @@ async function cargarProductosUsuario(userId) {
     contenedor.innerHTML = productos.map((p) => `
       <div class="col-md-4 mb-3">
         <div class="card h-100 shadow-sm border-0">
-          <img src="${p.fotos?.[0] ? CONFIG.UPLOAD_URL + '/products/' + p.fotos[0] : 'https://placehold.co/300x200?text=UcabMarket'}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="${escapeHtml(p.titulo)}">
+          <img src="${p.fotos?.[0] ? (p.fotos[0].startsWith('http') || p.fotos[0].startsWith('/') ? p.fotos[0] : CONFIG.UPLOAD_URL + '/products/' + p.fotos[0]) : 'https://placehold.co/300x200?text=UcabMarket'}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="${escapeHtml(p.titulo)}">
           <div class="card-body">
             <h6 class="card-title fw-bold">${escapeHtml(p.titulo)}</h6>
             <p class="text-primary fw-bold mb-1">$${p.precio}</p>
@@ -175,12 +179,13 @@ async function actualizarPerfil(e, currentUser) {
   const inputCarrera = document.getElementById('inputCarrera');
   const inputTelefono = document.getElementById('inputTelefono');
   const inputFotoPerfil = document.getElementById('inputFotoPerfil');
+  const inputAvatarArchivo = document.getElementById('inputAvatarArchivo');
   const inputPassword = document.getElementById('inputPassword');
 
   const nombreCompleto = inputNombre ? inputNombre.value.trim() : '';
   const carrera = inputCarrera ? inputCarrera.value.trim() : '';
   const telefono = inputTelefono ? inputTelefono.value.trim() : '';
-  const fotoPerfil = inputFotoPerfil ? inputFotoPerfil.value.trim() : '';
+  let fotoPerfil = inputFotoPerfil ? inputFotoPerfil.value.trim() : '';
   const password = inputPassword ? inputPassword.value : '';
 
   function mostrarAlertaModal(msg, tipo = 'danger') {
@@ -203,29 +208,59 @@ async function actualizarPerfil(e, currentUser) {
     mostrarAlertaModal('El nombre completo es obligatorio', 'warning');
     return;
   }
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreCompleto)) {
+    mostrarAlertaModal('El nombre completo no debe contener números ni caracteres especiales', 'warning');
+    return;
+  }
   if (!carrera) {
-    mostrarAlertaModal('La carrera o escuela es obligatoria', 'warning');
+    mostrarAlertaModal('La carrera es obligatoria', 'warning');
     return;
   }
-  if (password && password.length < 6) {
-    mostrarAlertaModal('La nueva contraseña debe tener al menos 6 caracteres', 'warning');
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(carrera)) {
+    mostrarAlertaModal('La carrera no debe contener números ni caracteres especiales', 'warning');
     return;
   }
-
-  const payload = {
-    nombreCompleto,
-    carrera,
-    telefono,
-    fotoPerfil,
-  };
-  if (password && password.length >= 6) {
-    payload.password = password;
+  if (telefono && !/^\d{11}$/.test(telefono)) {
+    mostrarAlertaModal('El teléfono debe tener exactamente 11 dígitos numéricos (ej. 04141234567)', 'warning');
+    return;
+  }
+  if (password) {
+    if (password.length < 6) {
+      mostrarAlertaModal('La contraseña debe tener al menos 6 caracteres', 'warning');
+      return;
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+      mostrarAlertaModal('La contraseña debe incluir tanto letras como números', 'warning');
+      return;
+    }
   }
 
   try {
     if (btnSubmit) {
       btnSubmit.disabled = true;
       btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+    }
+
+    // 1. Si el usuario seleccionó un archivo de imagen, subirlo primero
+    if (inputAvatarArchivo && inputAvatarArchivo.files && inputAvatarArchivo.files.length > 0) {
+      const formData = new FormData();
+      formData.append('avatar', inputAvatarArchivo.files[0]);
+
+      const resAvatar = await api.post(`/users/${currentUser.id}/avatar`, formData);
+      if (resAvatar && resAvatar.fotoPerfil) {
+        fotoPerfil = resAvatar.fotoPerfil;
+      }
+    }
+
+    // 2. Actualizar los demás campos del perfil
+    const payload = {
+      nombreCompleto,
+      carrera,
+      telefono,
+      fotoPerfil,
+    };
+    if (password && password.length >= 6) {
+      payload.password = password;
     }
 
     const actualizado = await api.patch(`/users/${currentUser.id}`, payload);
@@ -238,7 +273,7 @@ async function actualizarPerfil(e, currentUser) {
       modal.hide();
     }
 
-    // Actualizar vista inmediatamente sin forzar recarga brusca
+    // Actualizar vista inmediatamente
     await cargarDatosPerfil(currentUser.id, true);
     alert('¡Perfil actualizado con éxito!');
   } catch (err) {
