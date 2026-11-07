@@ -11,7 +11,8 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main"
+    "start:prod": "node dist/main",
+    "test": "jest"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",
@@ -33,15 +34,38 @@
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",
     "@nestjs/schematics": "^10.1.0",
+    "@nestjs/testing": "^10.4.22",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.14",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^29.7.0",
+    "socket.io-client": "^4.8.4",
+    "supertest": "^7.3.1",
+    "ts-jest": "^29.4.15",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "overrides": {
     "multer": "$multer"
+  },
+  "jest": {
+    "rootDir": ".",
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "testRegex": ".spec.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "transform": {
+      "^.+.ts$": "ts-jest"
+    },
+    "testEnvironment": "node"
   }
 }

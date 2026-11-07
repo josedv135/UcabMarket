@@ -99,6 +99,18 @@ Dado que el frontend es HTML/CSS/JavaScript nativo con Bootstrap vía CDN:
 
 ---
 
+### 4. Correr las pruebas automáticas
+
+Dentro de `backend`:
+
+```bash
+npm test
+```
+
+Las pruebas están en `backend/test` y hoy cubren las HU Crear Chat y Añadir archivos. Usan una base de datos en memoria y una carpeta temporal, así que no tocan `persistence/data` ni `uploads`.
+
+---
+
 ## 🧩 Arquitectura: Modelo, Vista y Controlador
 
 UcabMarket es un monolito modular con NestJS. Cada módulo del backend (`users`, `products`, `chats`, `questions`, `reviews`) sigue la misma separación:
